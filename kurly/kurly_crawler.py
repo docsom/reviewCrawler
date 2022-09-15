@@ -1,12 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
-from urllib.request import urlopen
 
 class NoMoreReviewError(Exception):
     pass
 
 goodsno = 5156999
-page = 1
 
 def extract_review_info(_goodsno, _page):
     url = "https://www.kurly.com/shop/goods/goods_review_list.php?goodsno={}&page={}".format(_goodsno, _page)
@@ -38,19 +36,21 @@ def extract_review_info(_goodsno, _page):
             product_name = inner_review_html.select_one("div.name_purchase > strong").get_text().replace("\n", "")
             review_text = inner_review_html.get_text().replace("\n", " ").replace(product_name, "").strip()
             
-            review_dict = {"review_num":review_num, "review_title":review_title, "review_user_grade":review_user_grade, "review_user_name":review_user_name, "review_time":review_time, "review_like_cnt":review_like_cnt, "review_text":review_text, "product_name": product_name}
+            review_dict = {"review_num":review_num, "review_title":review_title, "review_user_grade":review_user_grade, "review_user_name":review_user_name, "review_time":review_time, "review_like_cnt":review_like_cnt, "review_text":review_text, "product_name": product_name, "product_id": _goodsno}
             
             #print( "#", review_num, "#", review_title,  "#", review_user_grade,  "#", review_user_name,  "#", review_time,  "#", review_like_cnt, "#")
             #print("#", product_name, "#", review_text)
     else:
         print(response.status.code)
 
-
-
-while 1:
-    try:
-        extract_review_info(goodsno, page)
-    except NoMoreReviewError:
-        print("Every Review is Sorted in goodsno:{}".format(goodsno))
-        break
-    page += 1
+def extract_review_single_product(_goodsno):
+    page = 1
+    while 1:
+        try:
+            extract_review_info(_goodsno, page)
+        except NoMoreReviewError:
+            print("Every Review is Sorted in goodsno:{}".format(_goodsno))
+            break
+        page += 1
+        
+extract_review_single_product(goodsno)
