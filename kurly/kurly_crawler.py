@@ -8,35 +8,37 @@ end_page = 10
 
 goodsno = 5114889
 page = 2
-url = "https://www.kurly.com/shop/goods/goods_review_list.php?goodsno={}&page={}".format(goodsno, page)
 
-response = requests.get(url)
+def extract_review_info(_goodsno, _page):
+    url = "https://www.kurly.com/shop/goods/goods_review_list.php?goodsno={}&page={}".format(_goodsno, _page)
 
+    response = requests.get(url)
 
-if response.status_code == 200:
-    html = response.text
-    bsObject = BeautifulSoup(html, "lxml")
-    
-    reviews_html = bsObject.select('div.tr_line')
+    if response.status_code == 200:
+        html = response.text
+        bsObject = BeautifulSoup(html, "lxml")
+        
+        reviews_html = bsObject.select('div.tr_line')
 
-    for review_html in reviews_html:
-        table_html = review_html.select('table > tr > td')
-        
-        review_num = table_html[0].get_text().replace("\n", "").strip()
-        review_title = table_html[1].select_one('div').get_text().replace("\n", " ").strip()
-        review_user_grade = table_html[2].get_text().replace("\n", "").strip()
-        review_user_name = table_html[3].get_text().replace("\n", "").strip()
-        review_time = table_html[4].get_text().replace("\n", "").strip()
-        review_like_cnt = table_html[5].get_text().replace("\n", "").strip()
-        
-        
-        inner_review_html = review_html.select_one("div.review_view > div.inner_review")
-        product_name = inner_review_html.select_one("div.name_purchase > strong").get_text().replace("\n", "")
-        review_text = inner_review_html.get_text().replace("\n", " ").replace(product_name, "").strip()
-        
-        
-        #print( "#", review_num, "#", review_title,  "#", review_user_grade,  "#", review_user_name,  "#", review_time,  "#", review_like_cnt, "#")
-        break
-else:
-    print(response.status.code)
+        for review_html in reviews_html:
+            table_html = review_html.select('table > tr > td')
+            
+            review_num = table_html[0].get_text().replace("\n", "").strip()
+            review_title = table_html[1].select_one('div').get_text().replace("\n", " ").strip()
+            review_user_grade = table_html[2].get_text().replace("\n", "").strip()
+            review_user_name = table_html[3].get_text().replace("\n", "").strip()
+            review_time = table_html[4].get_text().replace("\n", "").strip()
+            review_like_cnt = table_html[5].get_text().replace("\n", "").strip()
+            
+            inner_review_html = review_html.select_one("div.review_view > div.inner_review")
+            product_name = inner_review_html.select_one("div.name_purchase > strong").get_text().replace("\n", "")
+            review_text = inner_review_html.get_text().replace("\n", " ").replace(product_name, "").strip()
+            
+            review_dict = {"review_num":review_num, "review_title":review_title, "review_user_grade":review_user_grade, "review_user_name":review_user_name, "review_time":review_time, "review_like_cnt":review_like_cnt, "review_text":review_text, "product_name": product_name}
+            
+            #print( "#", review_num, "#", review_title,  "#", review_user_grade,  "#", review_user_name,  "#", review_time,  "#", review_like_cnt, "#")
+            #print("#", product_name, "#", review_text)
+    else:
+        print(response.status.code)
 
+extract_review_info(goodsno, page)
