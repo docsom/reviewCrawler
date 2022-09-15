@@ -2,12 +2,11 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
+class NoMoreReviewError(Exception):
+    pass
 
-first_page = 1
-end_page = 10
-
-goodsno = 5114889
-page = 2
+goodsno = 5156999
+page = 1
 
 def extract_review_info(_goodsno, _page):
     url = "https://www.kurly.com/shop/goods/goods_review_list.php?goodsno={}&page={}".format(_goodsno, _page)
@@ -17,6 +16,11 @@ def extract_review_info(_goodsno, _page):
     if response.status_code == 200:
         html = response.text
         bsObject = BeautifulSoup(html, "lxml")
+        
+        no_data_html = bsObject.select_one('p.no_data')
+        
+        if no_data_html != None:
+            raise NoMoreReviewError
         
         reviews_html = bsObject.select('div.tr_line')
 
@@ -41,4 +45,12 @@ def extract_review_info(_goodsno, _page):
     else:
         print(response.status.code)
 
-extract_review_info(goodsno, page)
+
+
+while 1:
+    try:
+        extract_review_info(goodsno, page)
+    except NoMoreReviewError:
+        print("Every Review is Sorted in goodsno:{}".format(goodsno))
+        break
+    page += 1
