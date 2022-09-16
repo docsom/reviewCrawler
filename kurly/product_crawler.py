@@ -80,7 +80,7 @@ def get_products_info_in_single_category(_category_id, _sort_type=4):
 def get_save_products_info_in_single_category(_category_id, _sort_type=4):
     
     nowLoc = os.getcwd()
-    dirLoc = "{}/data/kurly/cat_{}".format(nowLoc, _category_id)
+    dirLoc = "{}/data/kurly/{}".format(nowLoc, _category_id)
 
     try:
         dirExist = os.path.exists(dirLoc)
@@ -104,6 +104,9 @@ def get_save_products_info_in_single_category(_category_id, _sort_type=4):
         for i in product_list:
             dictwriter_object.writerow(i)
             
+            
 
-_category_id = 913008
-get_save_products_info_in_single_category(_category_id)
+from category_id_info import product_category_splited_section
+
+for goodsno in product_category_splited_section:
+    get_save_products_info_in_single_category(goodsno)

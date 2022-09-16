@@ -69,8 +69,9 @@ product_category = [
     drink
 ]
     
+product_category_splited_section = mainDish[1] + saladHMR[1] + snack[1] + bakeryCheeseDeli[1] + drink[1]
 
-product_category_selected_all = [
+product_category_all = [
     mainDish[0],
     saladHMR[0],
     snack[0],
