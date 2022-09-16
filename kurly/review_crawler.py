@@ -4,12 +4,12 @@ from bs4 import BeautifulSoup
 class NoMoreReviewError(Exception):
     pass
 
-goodsno = 5156999
-
 def extract_review_info(_goodsno, _page):
     url = "https://www.kurly.com/shop/goods/goods_review_list.php?goodsno={}&page={}".format(_goodsno, _page)
 
     response = requests.get(url)
+    
+    #필요하다면 여기에 시간을 넣는 코드를 삽입
 
     if response.status_code == 200:
         html = response.text
@@ -52,5 +52,12 @@ def extract_review_single_product(_goodsno):
             print("Every Review is Sorted in goodsno:{}".format(_goodsno))
             break
         page += 1
-        
+
+
+
+goodsno = 5156999 # dummy, with 8 reviews
 extract_review_single_product(goodsno)
+
+# 상품목록을 불러오는 기능이 필요
+# 리뷰 목록을 저장하는 코드 필요
+# 상품 정보를 저장하는 기능도 필요할듯?
