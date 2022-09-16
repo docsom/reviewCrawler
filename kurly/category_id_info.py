@@ -1,4 +1,6 @@
 
+#https://api.kurly.com/v2/categories?ver=1
+
 mainDish = [
     911, # 국반찬메인요리전부
     [

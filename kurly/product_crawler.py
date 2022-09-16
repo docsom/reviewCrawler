@@ -1,29 +1,50 @@
 import requests
-from bs4 import BeautifulSoup
 import json
 
-category_id = 914004
-sort_type = 4
-token_url = "https://www.kurly.com/nx/api/session"
-
-token_response = requests.get(token_url)
-header = {
-    "authorization" : "Bearer " + json.loads(token_response.text)['accessToken']
-}
-
-
-url = "https://api.kurly.com/collection/v2/home/product-categories/{}/products?sort_type={}&page=1&per_page=99".format(category_id, sort_type)
-
-# header={
-#     'session_id' : "1098390459594528453",
-#     'identity_id' : "1098390459603534135",
-#     'identity' : "436a7271-0ae6-4015-a22a-e12f550d4158",
-#     'link' : "https://we.kurly.com/a/key_live_meOgzIdffiVWvdquf7Orkacksxa2LneN?%24identity_id=1098390459603534135",
+def get_auth_token():
+    token_url = "https://www.kurly.com/nx/api/session"
+    token_response = requests.get(token_url)
     
-# }
+    return json.loads(token_response.text)['accessToken']
 
-response = requests.get(url, headers=header)
 
-#https://www.kurly.com/nx/api/session
+def collect_product_info_in_single_category(_category_id, _sort_type=4):
+    '''
+    return type: list[json]
+    '''
+    
+    header = {
+        "authorization" : "Bearer " + get_auth_token()
+    }
 
-print(response.text)
+    isNext = True
+    page = 1
+    product_list = []
+
+    while isNext == True:
+        
+        print("Doing Page {}".format(page))
+        
+        url = "https://api.kurly.com/collection/v2/home/product-categories/{}/products?sort_type={}&page={}&per_page=99".format(_category_id, _sort_type, page)
+        response = requests.get(url, headers=header)
+        
+        if response.status_code == 200:
+            response_json = json.loads(response.text)
+            data = response_json['data']
+            
+            for product in data:
+                product_list.append(product)
+        
+            if response_json['meta']['pagination']['current_page'] == response_json['meta']['pagination']['total_pages']:
+                print("All of products in category:{} is taken.".format(_category_id))
+                break
+            
+            page += 1
+            
+        else:
+            print(response.status.code)
+            print("There is an error while making list of products")
+    
+    return product_list
+
+print(collect_product_info_in_single_category(913008))
