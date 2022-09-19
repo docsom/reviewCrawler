@@ -12,6 +12,7 @@ headersCSV = [
     'review_like_cnt',
     "review_text",
     'product_name',
+    'product_name_before'
     'product_id',
 ]
 class NoMoreReviewError(Exception):
@@ -50,7 +51,13 @@ def get_reviews_in_single_page(_goodsno, _page):
             
             inner_review_html = review_html.select_one("div.review_view > div.inner_review")
             product_name = inner_review_html.select_one("div.name_purchase > strong").get_text().replace("\n", "")
-            review_text = inner_review_html.get_text().replace("\n", " ").replace(product_name, "").strip()
+            product_name_2 = inner_review_html.select_one("div.name_purchase > p").get_text().replace("\n", "")
+            
+            def getText(parent):
+                return ''.join(parent.find_all(text=True, recursive=False)).strip()
+            
+            review_text = getText(inner_review_html)
+            
             
             review_dict = {
                 "review_num":review_num, 
@@ -61,6 +68,7 @@ def get_reviews_in_single_page(_goodsno, _page):
                 "review_like_cnt":review_like_cnt, 
                 "review_text":review_text, 
                 "product_name": product_name, 
+                "product_name_before" : product_name_2,
                 "product_id": _goodsno
             }
             
@@ -69,8 +77,7 @@ def get_reviews_in_single_page(_goodsno, _page):
         print("{}, page:{} done".format(_goodsno, _page))
             
         return review_list
-            #print( "#", review_num, "#", review_title,  "#", review_user_grade,  "#", review_user_name,  "#", review_time,  "#", review_like_cnt, "#")
-            #print("#", product_name, "#", review_text)
+    
     else:
         print(response.status.code)
 
