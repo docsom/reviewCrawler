@@ -47,7 +47,7 @@ def get_reviews_in_single_page(_goodsno, _page):
             review_user_grade = table_html[2].get_text().replace("\n", "").strip()
             review_user_name = table_html[3].get_text().replace("\n", "").strip()
             review_time = table_html[4].get_text().replace("\n", "").strip()
-            review_like_cnt = table_html[5].get_text().replace("\n", "").strip()
+            review_like_cnt = table_html[5].get_text().replace("\n", " ").strip()
             
             inner_review_html = review_html.select_one("div.review_view > div.inner_review")
             product_name = inner_review_html.select_one("div.name_purchase > strong").get_text().replace("\n", "")
@@ -56,8 +56,8 @@ def get_reviews_in_single_page(_goodsno, _page):
             def getText(parent):
                 return ''.join(parent.find_all(text=True, recursive=False)).strip()
             
-            review_text = getText(inner_review_html)
-            
+            review_text = getText(inner_review_html).replace("\n", " ").replace("\r", " ")
+            review_text = " ".join(review_text.split())
             
             review_dict = {
                 "review_num":review_num, 
@@ -120,7 +120,7 @@ def get_save_reviews_in_single_product(_category_id, _goodsno):
 # goodsno = 5057076
 # get_save_reviews_in_single_product(category_id, goodsno)
 
-def get_save_reviews_in_all_product_category():
+def get_save_reviews_in_all_category():
     
     category_ids = os.listdir('{}/data/kurly'.format(os.getcwd()))
 
@@ -134,3 +134,19 @@ def get_save_reviews_in_all_product_category():
             print("goodsno: {}'s review has been finished".format(goodsno))
             
         print("category: {}'s review has been finished".format(category_id))
+
+def get_save_reviews_in_single_category(category_id):
+    
+    goodsno_list = []
+    
+    with open('{}/data/kurly/{}/ids_{}.txt'.format(os.getcwd(), category_id, category_id), 'r', encoding='utf-8-sig') as f_object:
+        for line in f_object:
+            goodsno_list.append(line.strip())
+    for goodsno in goodsno_list:
+        get_save_reviews_in_single_product(category_id, goodsno)
+        print("goodsno: {}'s review has been finished".format(goodsno))
+        
+    print("category: {}'s review has been finished".format(category_id))
+    
+    with open('{}.data/kurly/log.txt', 'a') as f_object:
+        f_object.write(category_id)
