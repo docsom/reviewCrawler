@@ -12,7 +12,7 @@ headersCSV = [
     'review_like_cnt',
     "review_text",
     'product_name',
-    'product_name_before'
+    'product_name_before',
     'product_id',
 ]
 class NoMoreReviewError(Exception):
@@ -150,3 +150,5 @@ def get_save_reviews_in_single_category(category_id):
     
     with open('{}.data/kurly/log.txt', 'a') as f_object:
         f_object.write(category_id)
+        
+get_save_reviews_in_single_category(911004)
