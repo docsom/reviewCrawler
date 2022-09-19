@@ -52,7 +52,17 @@ def get_reviews_in_single_page(_goodsno, _page):
             product_name = inner_review_html.select_one("div.name_purchase > strong").get_text().replace("\n", "")
             review_text = inner_review_html.get_text().replace("\n", " ").replace(product_name, "").strip()
             
-            review_dict = {"review_num":review_num, "review_title":review_title, "review_user_grade":review_user_grade, "review_user_name":review_user_name, "review_time":review_time, "review_like_cnt":review_like_cnt, "review_text":review_text, "product_name": product_name, "product_id": _goodsno}
+            review_dict = {
+                "review_num":review_num, 
+                "review_title":review_title, 
+                "review_user_grade":review_user_grade, 
+                "review_user_name":review_user_name, 
+                "review_time":review_time, 
+                "review_like_cnt":review_like_cnt, 
+                "review_text":review_text, 
+                "product_name": product_name, 
+                "product_id": _goodsno
+            }
             
             review_list.append(review_dict)
             
@@ -105,9 +115,9 @@ def get_save_reviews_in_single_product(_category_id, _goodsno):
 
 def get_save_reviews_in_all_product_category():
     
-    file_names = os.listdir('{}/data/kurly'.format(os.getcwd()))
+    category_ids = os.listdir('{}/data/kurly'.format(os.getcwd()))
 
-    for category_id in file_names:
+    for category_id in category_ids:
         goodsno_list = []
         with open('{}/data/kurly/{}/ids_{}.txt'.format(os.getcwd(), category_id, category_id), 'r', encoding='utf-8-sig') as f_object:
             for line in f_object:
@@ -117,9 +127,3 @@ def get_save_reviews_in_all_product_category():
             print("goodsno: {}'s review has been finished".format(goodsno))
             
         print("category: {}'s review has been finished".format(category_id))
-
-
-    
-# 상품목록을 불러오는 기능이 필요
-# 리뷰 목록을 저장하는 코드 필요
-# 상품 정보를 저장하는 기능도 필요할듯?
