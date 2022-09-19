@@ -25,7 +25,7 @@ def get_reviews_in_single_page(_goodsno, _page):
     
     #필요하다면 여기에 시간을 넣는 코드를 삽입
 
-    if response.status_code == 200:
+    if response.status_code is 200:
         
         review_list = []
         
@@ -34,7 +34,7 @@ def get_reviews_in_single_page(_goodsno, _page):
         
         no_data_html = bsObject.select_one('p.no_data')
         
-        if no_data_html != None:
+        if no_data_html is not None:
             raise NoMoreReviewError
         
         reviews_html = bsObject.select('div.tr_line')
@@ -101,7 +101,7 @@ def get_save_reviews_in_single_product(_category_id, _goodsno):
 
     try:
         dirExist = os.path.exists(dirLoc)
-        if not dirExist :
+        if not dirExist:
             os.makedirs(dirLoc)
     except OSError:
             print("Error: Creating Dir {}".format(dirLoc))
