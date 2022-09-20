@@ -2,6 +2,7 @@ import requests
 import os
 from bs4 import BeautifulSoup
 from csv import DictWriter
+from review_manager import ReviewManager
 
 headersCSV = [
     'review_num',
@@ -72,7 +73,8 @@ def get_reviews_in_single_page(_goodsno, _page):
                 "product_id": _goodsno
             }
             
-            review_list.append(review_dict)
+            if review_num != "공지":
+                review_list.append(review_dict)
             
         print("{}, page:{} done".format(_goodsno, _page))
             
@@ -89,14 +91,31 @@ def get_reviews_in_single_product(_goodsno):
         try:
             review_list += get_reviews_in_single_page(_goodsno, page)
             
-            # 여기서 겹치면 멈추도록 해야 할 듯함.
-            # 필요한 수치: 지금까지 저장된 친구에서의 가장 높은 숫자, 내가 가져온 page에서의 가장 낮은 숫자 겹치는게 있으면 삭제해야 함.
         except NoMoreReviewError:
-            print("Every Review is Sorted in goodsno:{}".format(_goodsno))
+            print("Every Review is Taken in goodsno:{}".format(_goodsno))
             break
         page += 1
     
     return review_list
+
+def get_new_reviews_in_single_product(_category_id, _goodsno):
+    review_list = []
+
+    review_manager = ReviewManager(_category_id)
+    max, min = review_manager.get_max_min_of_product_id(_category_id)
+    
+    page = 1
+    while 1:
+        try:
+            temp_review_list = get_reviews_in_single_page(_goodsno, page)
+            for i in temp_review_list:
+                i += 1
+            
+            # 여기서 겹치면 멈추도록 해야 할 듯함.
+            # 필요한 수치: 지금까지 저장된 친구에서의 가장 높은 숫자, 내가 가져온 page에서의 가장 낮은 숫자 겹치는게 있으면 삭제해야 함.
+            
+        except NoMoreReviewError:
+            print("Every New Review is Taken in goodsno:{}".format(_goodsno))
 
 def get_save_reviews_in_single_product(_category_id, _goodsno):
     nowLoc = os.getcwd()

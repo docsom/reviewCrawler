@@ -77,3 +77,6 @@ class ReviewManager:
                 self.df.loc[_product_id, "min"] = min_num
         except:
             print("There is no product_id:{} in ReviewManager.".format(_product_id))
+            
+    def get_max_min_of_product_id(self, _product_id):
+        return self.df.loc[_product_id, "max"], self.df.loc[_product_id, "min"]
