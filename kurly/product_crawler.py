@@ -104,9 +104,9 @@ def get_save_products_info_in_single_category(_category_id, _sort_type=4):
         for i in product_list:
             dictwriter_object.writerow(i)
             
-            
+def get_save_product_info_in_all_category():
 
-from category_id_info import product_category_splited_section
+    from category_id_info import product_category_splited_section
 
-for goodsno in product_category_splited_section:
-    get_save_products_info_in_single_category(goodsno)
+    for goodsno in product_category_splited_section:
+        get_save_products_info_in_single_category(goodsno)
