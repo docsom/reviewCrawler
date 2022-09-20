@@ -173,4 +173,3 @@ def get_save_reviews_in_single_category(category_id):
     with open('{}.data/kurly/log.txt', 'a') as f_object:
         f_object.write(category_id)
         
-get_save_reviews_in_single_category(911004)
