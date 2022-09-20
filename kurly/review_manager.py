@@ -31,6 +31,8 @@ def init_review_manager(_category_id, _manager_loc):
 
 class ReviewManager:
     def __init__(self, _category_id):
+        
+        self.category_id = _category_id
         now_loc = os.getcwd()
         category_loc = "{}/data/kurly/{}".format(now_loc, _category_id)
         
@@ -49,6 +51,15 @@ class ReviewManager:
             init_review_manager(_category_id, self.manager_loc)
         else:
             self.df = pd.read_csv(self.manager_loc)
+            
+    def info(self):
+        product_num = 0
+        review_num = 0
+        for _, row in self.df.iterrows():
+            product_num += 1
+            temp = row[2] - row[3] + 1
+            review_num += temp
+        print("Category: {}, # of Product: {}, # of Review: {}".format(self.category_id, product_num, review_num))
     
     def save(self):
         self.df.to_csv(self.manager_loc, index=False, encoding="utf-8")
