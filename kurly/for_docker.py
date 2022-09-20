@@ -1,0 +1,3 @@
+from review_crawler import get_save_reviews_in_single_category
+
+get_save_reviews_in_single_category(911006)
