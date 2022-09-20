@@ -88,6 +88,9 @@ def get_reviews_in_single_product(_goodsno):
     while 1:
         try:
             review_list += get_reviews_in_single_page(_goodsno, page)
+            
+            # 여기서 겹치면 멈추도록 해야 할 듯함.
+            # 필요한 수치: 지금까지 저장된 친구에서의 가장 높은 숫자, 내가 가져온 page에서의 가장 낮은 숫자 겹치는게 있으면 삭제해야 함.
         except NoMoreReviewError:
             print("Every Review is Sorted in goodsno:{}".format(_goodsno))
             break
