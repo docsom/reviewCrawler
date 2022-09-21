@@ -22,9 +22,13 @@ def init_review_manager(_category_id, _manager_loc):
         for product_id in product_ids:
             
             data = pd.read_csv('{}/data/kurly/{}/reviews/{}.csv'.format(os.getcwd(), _category_id, product_id))
-            data = [int(id) for id in data.review_num if id.isdigit()]
-            _max = max(data)
-            _min = min(data)
+            data = [int(id) for id in data.review_num if str(id).isdigit()]
+            if len(data) != 0:
+                _max = max(data)
+                _min = min(data)
+            else:
+                _max = 0
+                _min = 1
             
             temp_dict = {'category_id': _category_id, 'product_id': product_id, 'max': _max, 'min': _min}
             dictwriter_object.writerow(temp_dict)
