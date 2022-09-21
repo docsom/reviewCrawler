@@ -49,8 +49,8 @@ class ReviewManager:
         
         if not manager_exist:
             init_review_manager(_category_id, self.manager_loc)
-        else:
-            self.df = pd.read_csv(self.manager_loc)
+            
+        self.df = pd.read_csv(self.manager_loc)
             
     def info(self):
         product_num = 0
