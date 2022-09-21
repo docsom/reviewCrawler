@@ -1,5 +1,6 @@
 import requests
 import os
+import pandas as pd
 from bs4 import BeautifulSoup
 from csv import DictWriter
 from review_manager import ReviewManager
@@ -16,6 +17,9 @@ headersCSV = [
     'product_name_before',
     'product_id',
 ]
+
+nowLoc = os.getcwd()
+
 class NoMoreReviewError(Exception):
     pass
 
@@ -26,7 +30,7 @@ def get_reviews_in_single_page(_goodsno, _page):
     
     #필요하다면 여기에 시간을 넣는 코드를 삽입
 
-    if response.status_code is 200:
+    if response.status_code == 200:
         
         review_list = []
         
@@ -35,7 +39,7 @@ def get_reviews_in_single_page(_goodsno, _page):
         
         no_data_html = bsObject.select_one('p.no_data')
         
-        if no_data_html is not None:
+        if no_data_html != None:
             raise NoMoreReviewError
         
         reviews_html = bsObject.select('div.tr_line')
@@ -127,8 +131,31 @@ def get_new_reviews_in_single_product(_category_id, _goodsno):
             
     return review_list
 
+def get_target_products_list_in_single_product(_category_id):
+    manager_loc = "{}/data/kurly/{}/{}_review_manager.csv".format(nowLoc, _category_id, _category_id)
+    ids_loc = "{}/data/kurly/{}/ids_{}.txt".format(nowLoc, _category_id, _category_id)
+    
+    #maangerLoc에서 불러와서 딱 product_id만 list로 가져오고
+    manager_list = [id for id in pd.read_csv(manager_loc).product_id]
+    
+    # idsLoc에서 list로 가져오고
+    ids_list = []
+    with open(ids_loc, 'r', encoding="utf-8-sig") as f_object:
+        while True:
+            line = f_object.readline().strip()
+            if not line: break
+            ids_list.append(int(line))
+    
+    # idsLoc에서 managerLoc에 없는 애들을 list로 걸러서 리턴하기
+    target_ids = [id for id in ids_list if id not in manager_list]
+    testit = [id for id in manager_list if id not in ids_list]
+    print(testit)
+    
+    #print(len(manager_list), len(ids_list), len(target_ids))
+    return target_ids
+
 def get_save_reviews_in_single_product(_category_id, _goodsno):
-    nowLoc = os.getcwd()
+    
     dirLoc = "{}/data/kurly/{}/reviews".format(nowLoc, _category_id)
 
     try:
@@ -154,11 +181,11 @@ def get_save_reviews_in_single_product(_category_id, _goodsno):
 
 def get_save_reviews_in_all_category():
     
-    category_ids = os.listdir('{}/data/kurly'.format(os.getcwd()))
+    category_ids = os.listdir('{}/data/kurly'.format(nowLoc))
 
     for category_id in category_ids:
         goodsno_list = []
-        with open('{}/data/kurly/{}/ids_{}.txt'.format(os.getcwd(), category_id, category_id), 'r', encoding='utf-8-sig') as f_object:
+        with open('{}/data/kurly/{}/ids_{}.txt'.format(nowLoc, category_id, category_id), 'r', encoding='utf-8-sig') as f_object:
             for line in f_object:
                 goodsno_list.append(line.strip())
         for goodsno in goodsno_list:
