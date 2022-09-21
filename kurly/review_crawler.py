@@ -23,6 +23,9 @@ nowLoc = os.getcwd()
 class NoMoreReviewError(Exception):
     pass
 
+class NoSuchFileError(Exception):
+    pass
+
 def get_reviews_in_single_page(_goodsno, _page):
     url = "https://www.kurly.com/shop/goods/goods_review_list.php?goodsno={}&page={}".format(_goodsno, _page)
 
@@ -135,10 +138,18 @@ def get_target_products_list_in_single_product(_category_id):
     manager_loc = "{}/data/kurly/{}/{}_review_manager.csv".format(nowLoc, _category_id, _category_id)
     ids_loc = "{}/data/kurly/{}/ids_{}.txt".format(nowLoc, _category_id, _category_id)
     
-    #maangerLoc에서 불러와서 딱 product_id만 list로 가져오고
+    manager_exist = os.path.exists(manager_loc)
+    ids_exist = os.path.exists(ids_loc)
+    
+    if not manager_exist:
+        print("You should make {}_review_manager.csv first.".format(_category_id))
+        raise NoSuchFileError
+    if not ids_exist:
+        print("You should make ids_{}.txt first.".format(_category_id))
+        raise NoSuchFileError
+    
     manager_list = [id for id in pd.read_csv(manager_loc).product_id]
     
-    # idsLoc에서 list로 가져오고
     ids_list = []
     with open(ids_loc, 'r', encoding="utf-8-sig") as f_object:
         while True:
@@ -146,12 +157,8 @@ def get_target_products_list_in_single_product(_category_id):
             if not line: break
             ids_list.append(int(line))
     
-    # idsLoc에서 managerLoc에 없는 애들을 list로 걸러서 리턴하기
     target_ids = [id for id in ids_list if id not in manager_list]
-    testit = [id for id in manager_list if id not in ids_list]
-    print(testit)
     
-    #print(len(manager_list), len(ids_list), len(target_ids))
     return target_ids
 
 def get_save_reviews_in_single_product(_category_id, _goodsno):
@@ -180,6 +187,11 @@ def get_save_reviews_in_single_product(_category_id, _goodsno):
 # get_save_reviews_in_single_product(category_id, goodsno)
 
 def get_save_reviews_in_all_category():
+    '''
+    ids_(category_id).txt 안에 있는 product List를 읽어서 돌림
+    
+    이 과정을 data/kurly 안에 들어있는 모든 카테고리 이름을 불러와서 진행함
+    '''
     
     category_ids = os.listdir('{}/data/kurly'.format(nowLoc))
 
@@ -209,4 +221,8 @@ def get_save_reviews_in_single_category(category_id):
     
     with open('{}.data/kurly/log.txt', 'a') as f_object:
         f_object.write(category_id)
-        
+
+def get_save_reviews_in_left_products_in_single_category(_category_id):
+    target_product_ids = get_target_products_list_in_single_product(_category_id)
+    for goodsno in target_product_ids:
+        get_save_reviews_in_single_product(_category_id, goodsno)
