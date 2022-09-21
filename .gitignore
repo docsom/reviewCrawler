@@ -180,3 +180,4 @@ data/*
 *.csv
 test.*
 temp.*
+*.exe
