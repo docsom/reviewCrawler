@@ -34,7 +34,7 @@ def init_review_manager(_category_id, _manager_loc):
             dictwriter_object.writerow(temp_dict)
 
 class ReviewManager:
-    def __init__(self, _category_id):
+    def __init__(self, _category_id, _mode="remake"):
         
         self.category_id = _category_id
         now_loc = os.getcwd()
@@ -51,9 +51,9 @@ class ReviewManager:
         
         manager_exist = os.path.exists(self.manager_loc)
         
-        if not manager_exist:
+        if (not manager_exist) or (_mode == 'remake'):
             init_review_manager(_category_id, self.manager_loc)
-            
+        
         self.df = pd.read_csv(self.manager_loc)
             
     def info(self):
