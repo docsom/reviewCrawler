@@ -21,7 +21,8 @@ import pandas as pd
 
 nowLoc = os.getcwd()
 
-text_len = 50
+max_num_review = 60
+min_text_len = 50
 
 headersCSV = [
     "review_title",
@@ -48,7 +49,7 @@ def judge_value_of_review(_text):
     if _text == None:
         return False
     
-    if len(_text) >= text_len:
+    if len(_text) >= min_text_len:
         return True
     else:
         return False
@@ -167,7 +168,7 @@ num_buttons = len(driver.find_elements(By.XPATH, buttons_xpath))
 
 save_reviews(category_id, product_id, reviews_single_page)
 
-_page = 1
+num_review = 5
 flag = True
 
 while(1):
@@ -184,10 +185,11 @@ while(1):
             flag = False
             break
         
-        if _page >= 13:
+        if num_review >= max_num_review:
             flag = False
             break
-        _page += 1
+        
+        num_review += 5
     if flag == False:
         break
     
