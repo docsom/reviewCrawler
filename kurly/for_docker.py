@@ -2,8 +2,12 @@ from review_crawler import *
 
 from product_crawler import *
 
+from category_id_info import product_category_splited_section
+
 from review_manager import ReviewManager
 
-category_id = 911006
+a = product_category_splited_section
+a.remove(911004)
+a.remove(911006)
 
-get_save_reviews_in_left_products_in_single_category(category_id)
+get_save_reviews_in_certain_category(a)
