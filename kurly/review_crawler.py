@@ -27,6 +27,7 @@ class NoMoreReviewError(Exception):
 class NoSuchFileError(Exception):
     pass
 
+
 def get_reviews_in_single_page(_goodsno, _page):
     url = "https://www.kurly.com/shop/goods/goods_review_list.php?goodsno={}&page={}".format(_goodsno, _page)
 
@@ -84,12 +85,11 @@ def get_reviews_in_single_page(_goodsno, _page):
             if review_num != "공지":
                 review_list.append(review_dict)
             
-        print("{}, page:{} done".format(_goodsno, _page))
-            
         return review_list
     
     else:
         print(response.status.code)
+
 
 def get_reviews_in_single_product(_goodsno, _limit=5000):
     '''
@@ -98,11 +98,11 @@ def get_reviews_in_single_product(_goodsno, _limit=5000):
     '''
     
     review_list = []
-    
     page = 1
     while 1:
         try:
             review_list += get_reviews_in_single_page(_goodsno, page)
+            print("{}, page:{} done, total_reviews: {}".format(_goodsno, page, len(review_list)))
             if len(review_list) >= _limit:
                 print("More than {} Review is Taken in goodsno:{}".format(_limit, _goodsno))
                 break
@@ -114,12 +114,16 @@ def get_reviews_in_single_product(_goodsno, _limit=5000):
     
     return review_list
 
-def get_new_reviews_in_single_product(_category_id, _goodsno):
-    review_list = []
 
+def get_new_reviews_in_single_product(_category_id, _goodsno):
+    '''
+    지금 안씀
+    '''
+    
+    review_list = []
     review_manager = ReviewManager(_category_id)
     _max, _min = review_manager.get_max_min_of_product_id(_category_id)
-    
+
     page = 1
     while 1:
         try:
@@ -137,11 +141,11 @@ def get_new_reviews_in_single_product(_category_id, _goodsno):
             else:
                 review_list += temp_review_list
                 page += 1
-            
         except NoMoreReviewError:
             print("Every New Review is Taken in goodsno:{}".format(_goodsno))
             
     return review_list
+
 
 def get_target_products_list_in_single_product(_category_id):
     manager_loc = "{}/data/kurly/{}/{}_review_manager.csv".format(nowLoc, _category_id, _category_id)
@@ -170,6 +174,7 @@ def get_target_products_list_in_single_product(_category_id):
     
     return target_ids
 
+
 def get_save_reviews_in_single_product(_category_id, _goodsno):
     '''
     특정 카테고리 안의, 특정 상품에 대해 리뷰를 가져오고 저장함
@@ -195,9 +200,7 @@ def get_save_reviews_in_single_product(_category_id, _goodsno):
         for i in review_list:
             dictwriter_object.writerow(i)
             
-# category_id = 911001
-# goodsno = 5057076
-# get_save_reviews_in_single_product(category_id, goodsno)
+
 
 def get_save_reviews_in_certain_category(_category_ids):
 
@@ -214,20 +217,20 @@ def get_save_reviews_in_certain_category(_category_ids):
                 print("goodsno: {} is incompleted".format(goodsno))
                 try:
                     with open('{}/data/kurly_unfinished_info.txt'.format(nowLoc), 'a', encoding='utf-8-sig') as f_object:
-                        f_object.write(category_id)
+                        f_object.write(str(category_id) + "\n")
                 except:
                     print("I couldn't make kurly_unfinished_info")
                 time.sleep(10)
                 continue
                 
-            
         print("category: {}'s review has been finished".format(category_id))
         
         try:
             with open('{}/data/kurly_info.txt'.format(nowLoc), 'a', encoding='utf-8-sig') as f_object:
-                f_object.write(category_id)
+                f_object.write(str(category_id) + "\n")
         except:
             print("I can't make kurly_info.txt")
+
 
 def get_save_reviews_in_all_category():
     '''
@@ -248,6 +251,7 @@ def get_save_reviews_in_all_category():
             print("goodsno: {}'s review has been finished".format(goodsno))
             
         print("category: {}'s review has been finished".format(category_id))
+
 
 def get_save_reviews_in_single_category(category_id):
     
