@@ -96,7 +96,6 @@ def get_reviews_in_single_product(_goodsno, _limit=5000):
     특정 카테고리 안의, 특정 상품에 대해 리뷰를 가져옴
     return list(dict, dict, ....)
     '''
-    
     review_list = []
     page = 1
     while 1:
@@ -119,7 +118,6 @@ def get_new_reviews_in_single_product(_category_id, _goodsno):
     '''
     지금 안씀
     '''
-    
     review_list = []
     review_manager = ReviewManager(_category_id)
     _max, _min = review_manager.get_max_min_of_product_id(_category_id)
@@ -148,6 +146,12 @@ def get_new_reviews_in_single_product(_category_id, _goodsno):
 
 
 def get_target_products_list_in_single_product(_category_id):
+    '''
+    review_manager 안에 들어가 있는 상품코드랑 ids.txt 에 있는 상품코드를 비교해서
+    ids 안에만 있는 product_id를 반환함(이 친구들만 안된거니까)
+    input: int or str(_category_id)
+    output: list[category_id, category_id...]
+    '''
     manager_loc = "{}/data/kurly/{}/{}_review_manager.csv".format(nowLoc, _category_id, _category_id)
     ids_loc = "{}/data/kurly/{}/ids_{}.txt".format(nowLoc, _category_id, _category_id)
     
@@ -180,7 +184,6 @@ def get_save_reviews_in_single_product(_category_id, _goodsno):
     특정 카테고리 안의, 특정 상품에 대해 리뷰를 가져오고 저장함
     return None
     '''
-    
     dirLoc = "{}/data/kurly/{}/reviews".format(nowLoc, _category_id)
 
     try:
@@ -203,7 +206,10 @@ def get_save_reviews_in_single_product(_category_id, _goodsno):
 
 
 def get_save_reviews_in_certain_category(_category_ids):
-
+    '''
+    ids_(category_id).txt 안에 있는 product List를 읽어서 돌림. 
+    이 과정을 input list 안에 들어가있는 category_id들에 기반해서 진행
+    '''
     for category_id in _category_ids:
         goodsno_list = []
         with open('{}/data/kurly/{}/ids_{}.txt'.format(nowLoc, category_id, category_id), 'r', encoding='utf-8-sig') as f_object:
@@ -234,11 +240,9 @@ def get_save_reviews_in_certain_category(_category_ids):
 
 def get_save_reviews_in_all_category():
     '''
-    ids_(category_id).txt 안에 있는 product List를 읽어서 돌림
-    
+    ids_(category_id).txt 안에 있는 product List를 읽어서 돌림.
     이 과정을 data/kurly 안에 들어있는 모든 카테고리 이름을 불러와서 진행함
     '''
-    
     category_ids = os.listdir('{}/data/kurly'.format(nowLoc))
 
     for category_id in category_ids:
