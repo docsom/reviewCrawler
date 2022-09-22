@@ -11,3 +11,15 @@ RUN sudo apt-get install -y python-lxml
 RUN sudo apt-get install -y python3-bs4
 RUN sudo apt-get install -y python3-pandas
 RUN pip3 install requests
+
+RUN cd home
+RUN mkdir crawler
+RUN cd crawler
+
+
+
+# for selenium
+#RUN pip3 install selenium
+#RUN pip3 install webdriver_manager
+#RUN apt-get install -y fonts-nanum*
+
