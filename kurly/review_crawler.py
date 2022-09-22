@@ -4,6 +4,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from csv import DictWriter
 from review_manager import ReviewManager
+import time
 
 headersCSV = [
     'review_num',
@@ -206,8 +207,19 @@ def get_save_reviews_in_certain_category(_category_ids):
             for line in f_object:
                 goodsno_list.append(line.strip())
         for goodsno in goodsno_list:
-            get_save_reviews_in_single_product(category_id, goodsno)
-            print("goodsno: {}'s review has been finished".format(goodsno))
+            try:
+                get_save_reviews_in_single_product(category_id, goodsno)
+                print("goodsno: {}'s review has been finished".format(goodsno))
+            except:
+                print("goodsno: {} is incompleted".format(goodsno))
+                try:
+                    with open('{}/data/kurly_unfinished_info.txt'.format(nowLoc), 'a', encoding='utf-8-sig') as f_object:
+                        f_object.write(category_id)
+                except:
+                    print("I couldn't make kurly_unfinished_info")
+                time.sleep(10)
+                continue
+                
             
         print("category: {}'s review has been finished".format(category_id))
         
@@ -215,7 +227,7 @@ def get_save_reviews_in_certain_category(_category_ids):
             with open('{}/data/kurly_info.txt'.format(nowLoc), 'a', encoding='utf-8-sig') as f_object:
                 f_object.write(category_id)
         except:
-            pass
+            print("I can't make kurly_info.txt")
 
 def get_save_reviews_in_all_category():
     '''
