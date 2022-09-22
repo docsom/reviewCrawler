@@ -1,54 +1,125 @@
-#https://waytothem.com/blog/163/
+#https://msgoel.tistory.com/entry/%ED%8C%8C%EC%9D%B4%EC%8D%AC-%ED%81%AC%EB%A1%A4%EB%A7%81-%EC%BF%A0%ED%8C%A1-%EB%A1%9C%EA%B7%B8%EC%9D%B8-%EC%B0%A8%EB%8B%A8-%EC%A0%91%EC%86%8D-%EA%B1%B0%EB%B6%80-Access-Denied-%EB%AC%B8%EC%A0%9C-%ED%95%B4%EA%B2%B0-%EB%B0%A9%EB%B2%95
 
-#from multiprocessing import Pool
+# this one is for Selenium
+# If I find route only with requests, I'll move to it.
 
-#pepp8 해보기 control k f
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By 
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
-#https://www.coupang.com/vp/products/1717552921/items/2923167957/vendoritems/70911802261
-import json
 from bs4 import BeautifulSoup
-import requests
-import os
+import subprocess
+import time
+import random
+import shutil
 
-nowLoc = os.getcwd()
-with open("{}/Coupang/Headers.json".format(nowLoc), 'r') as f_object:
-    headers = json.load(f_object)
-class Coupang:
-    def get_product_code(self, url):
-        prod_code = url.split('products/')[-1].split('?')[0]
-        return prod_code
+text_len = 50
+
+def rantime(_min = 0., _max = 1.):
+    num = random.random()
+    return _min + num * (_max - _min)
+
+
+def judge_value_of_review(_text):
+    '''
+    input: str(review's text)
+    output: boolean(if quality is good True else False)
+    '''
+    if _text == None:
+        return False
     
-    def __init__(self):
-        self.__headers = headers['headers']
-        
-    def main(self):
-        
-        #URL = self.input_review_url()
-        URL = "https://www.coupang.com/vp/products/6638786505?itemId=15167378523&vendorItemId=82388756551&sourceType=cmgoms&isAddedCart="
-        
-        prod_code = self.get_product_code(url=URL)
+    if len(_text) >= text_len:
+        return True
+    else:
+        return False
     
-        URLS = [f'https://www.coupang.com/vp/product/reviews?productId={prod_code}&amp;page={page}&amp;size=5&amp;sortBy=ORDER_SCORE_ASC&amp;ratings=&amp;q=&amp;viRoleCode=3&amp;ratingSummary=true' for page in range(1,1 + 1)]
+    
+def extract_review_info(_element, _product_id=None):
+    '''
+    input: html element
+    output: python dictionary
+    '''
+    elementHTML = _element.get_attribute('outerHTML')
+    review_html = BeautifulSoup(elementHTML, "lxml").select('html > body > article')
+    
+    reviewer_html = review_html[0].select('article > div > div')
+    
+    review_user_name = reviewer_html[1].get_text().strip()
+    review_user_grade = reviewer_html[2].select('div > div > div > div')[0]['data-rating']
+    review_time = reviewer_html[2].select('div > div > div')[2].get_text().strip()
+    product_name = reviewer_html[4].get_text().strip()
+    review_title = review_html[0].select_one('article > div.sdp-review__article__list__headline')
+    review_title = review_title.get_text().strip() if review_title != None else None
+    review_text = review_html[0].select_one('article > div.sdp-review__article__list__review')
+    review_text = review_text.get_text().strip() if review_text != None else None
+    review_survey = review_html[0].select_one('article > div.sdp-review__article__list__survey')
+    review_survey = review_survey.get_text().strip() if review_survey != None else None
+    review_help_cnt = review_html[0].select_one('article > div.sdp-review__article__list__help')
+    review_help_cnt = review_help_cnt['data-count'] if review_help_cnt != None else None
+    
+    review_dict = {
+        "review_title": review_title,
+        "review_user_grade" : review_user_grade,
+        "review_user_name" : review_user_name,
+        "review_time" : review_time, 
+        "review_help_cnt" : review_help_cnt,
+        "review_text" : review_text,
+        "review_survey" : review_survey,
+        'product_name' : product_name,
+        "product_id" : _product_id,
+    }
+    return review_dict
 
-        
-        self.__headers['referer'] = URL
 
-        print(self.__headers)
+def extract_review_info_in_single_page(_elements, _product_id = None):
+    '''
+    input: list[html element, html element...]
+    output: list[dict, dict...]
+    '''
+    quality = True
+    reviews_info = []
+    for review_html in reviews_html:
+        review_info = extract_review_info(review_html)
+        if judge_value_of_review(review_info['review_text']) == True:
+            reviews_info.append(review_info)
+        else:
+            quality = False
+    
+    return reviews_info, quality
 
-        with requests.Session() as session:
-            [self.fetch(url=url,session=session) for url in URLS]
 
-        print("hi")
-        return None
-        
-    def fetch(self,url,session):
-        print("fetch")
-        with session.get(url=url,headers=self.__headers) as response:
-            print("response")
-            html = response.text
-            soup = BeautifulSoup(html,'html.parser')
-            print(soup.prettify())
-            
-coupang = Coupang()
-coupang.main()
+subprocess.Popen(r'C:\Program Files\Google\Chrome\Application\chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\chrometemp"')
+options = webdriver.ChromeOptions()
+options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
 
+driver=webdriver.Chrome('./chromedriver.exe', options=options)
+#driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+
+driver.implicitly_wait(3)
+
+
+url = "https://www.coupang.com/vp/products/1717552921?itemId=2923167957&vendorItemId=70911802261&sourceType=CATEGORY&categoryId=502382&isAddedCart="
+driver.get(url)
+time.sleep(rantime(2.3, 2.7))
+
+driver.find_element(By.TAG_NAME, "body").send_keys(Keys.PAGE_DOWN)
+driver.find_element(By.TAG_NAME, "body").send_keys(Keys.PAGE_DOWN)
+driver.find_element(By.TAG_NAME, "body").send_keys(Keys.PAGE_DOWN)
+
+time.sleep(rantime(0.4, 0.6))
+
+driver.find_element(By.XPATH, '//*[@id="btfTab"]/ul[1]/li[2]').click()
+
+reviews_html = driver.find_elements(By.XPATH, '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[4]/article')
+
+reviews_single_page, quality = extract_review_info_in_single_page(reviews_html)
+
+print(len(reviews_single_page))
+
+temp = 0
+
+
+driver.close()
