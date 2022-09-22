@@ -90,13 +90,21 @@ def get_reviews_in_single_page(_goodsno, _page):
     else:
         print(response.status.code)
 
-def get_reviews_in_single_product(_goodsno):
+def get_reviews_in_single_product(_goodsno, _limit=5000):
+    '''
+    특정 카테고리 안의, 특정 상품에 대해 리뷰를 가져옴
+    return list(dict, dict, ....)
+    '''
+    
     review_list = []
     
     page = 1
     while 1:
         try:
             review_list += get_reviews_in_single_page(_goodsno, page)
+            if len(review_list) >= _limit:
+                print("More than {} Review is Taken in goodsno:{}".format(_limit, _goodsno))
+                break
             
         except NoMoreReviewError:
             print("Every Review is Taken in goodsno:{}".format(_goodsno))
@@ -162,6 +170,10 @@ def get_target_products_list_in_single_product(_category_id):
     return target_ids
 
 def get_save_reviews_in_single_product(_category_id, _goodsno):
+    '''
+    특정 카테고리 안의, 특정 상품에 대해 리뷰를 가져오고 저장함
+    return None
+    '''
     
     dirLoc = "{}/data/kurly/{}/reviews".format(nowLoc, _category_id)
 
@@ -185,6 +197,25 @@ def get_save_reviews_in_single_product(_category_id, _goodsno):
 # category_id = 911001
 # goodsno = 5057076
 # get_save_reviews_in_single_product(category_id, goodsno)
+
+def get_save_reviews_in_certain_category(_category_ids):
+
+    for category_id in _category_ids:
+        goodsno_list = []
+        with open('{}/data/kurly/{}/ids_{}.txt'.format(nowLoc, category_id, category_id), 'r', encoding='utf-8-sig') as f_object:
+            for line in f_object:
+                goodsno_list.append(line.strip())
+        for goodsno in goodsno_list:
+            get_save_reviews_in_single_product(category_id, goodsno)
+            print("goodsno: {}'s review has been finished".format(goodsno))
+            
+        print("category: {}'s review has been finished".format(category_id))
+        
+        try:
+            with open('{}/data/kurly_info.txt'.format(nowLoc), 'a', encoding='utf-8-sig') as f_object:
+                f_object.write(category_id)
+        except:
+            pass
 
 def get_save_reviews_in_all_category():
     '''
