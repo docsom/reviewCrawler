@@ -11,12 +11,29 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
 from bs4 import BeautifulSoup
+import os
 import subprocess
 import time
 import random
 import shutil
+from csv import DictWriter
+import pandas as pd
+
+nowLoc = os.getcwd()
 
 text_len = 50
+
+headersCSV = [
+    "review_title",
+    "review_user_grade",
+    "review_user_name",
+    "review_time",
+    "review_help_cnt",
+    "review_text",
+    "review_survey",
+    'product_name',
+    "product_id"
+]
 
 def rantime(_min = 0., _max = 1.):
     num = random.random()
@@ -90,6 +107,29 @@ def extract_review_info_in_single_page(_elements, _product_id = None):
     
     return reviews_info, should_stop
 
+def save_reviews(_category_id, _product_id, _review_list):
+    try:
+        dir_loc = '{}/data/coupang/{}/reviews'.format(nowLoc, _category_id)
+        print(dir_loc)
+    
+        try:
+            dirExist = os.path.exists(dir_loc)
+            if not dirExist :
+                os.makedirs(dir_loc)
+        except OSError:
+                print("Error: Creating Dir {}".format(dir_loc))
+    
+        with open('{}/{}.csv'.format(dir_loc, _product_id), 'a', newline='', encoding="utf-8-sig") as f_object:
+            dictwriter_object = DictWriter(f_object, fieldnames=headersCSV)
+            dictwriter_object.writeheader()
+            for i in _review_list:
+                dictwriter_object.writerow(i)
+    except:
+        "I think there is something wrong with saving..."
+    
+category_id = 502382
+product_id = 1717552921
+url = "https://www.coupang.com/vp/products/{}?itemId=2923167957&vendorItemId=70911802261&sourceType=CATEGORY&categoryId={}&isAddedCart=".format(product_id, category_id)
 
 subprocess.Popen(r'C:\Program Files\Google\Chrome\Application\chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\chrometemp"')
 options = webdriver.ChromeOptions()
@@ -100,8 +140,6 @@ driver=webdriver.Chrome('./chromedriver.exe', options=options)
 
 driver.implicitly_wait(3)
 
-
-url = "https://www.coupang.com/vp/products/1717552921?itemId=2923167957&vendorItemId=70911802261&sourceType=CATEGORY&categoryId=502382&isAddedCart="
 driver.get(url)
 time.sleep(rantime(2.3, 2.7))
 
@@ -115,7 +153,6 @@ driver.find_element(By.XPATH, '//*[@id="btfTab"]/ul[1]/li[2]').click()
 
 reviews_html = driver.find_elements(By.XPATH, '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[4]/article')
 
-review_list = []
 
 reviews_single_page, should_stop = extract_review_info_in_single_page(reviews_html)
 
@@ -125,11 +162,10 @@ time.sleep(rantime(1.1, 1.32))
 #if should_stop == False:
 #   break
 
-review_list += reviews_single_page
-
 buttons_xpath = '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[4]/div[3]/button'
 num_buttons = len(driver.find_elements(By.XPATH, buttons_xpath))
 
+save_reviews(category_id, product_id, reviews_single_page)
 
 _page = 1
 flag = True
@@ -141,19 +177,20 @@ while(1):
         time.sleep(rantime(1.9, 2.35))
         reviews_html = driver.find_elements(By.XPATH, '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[4]/article')
         reviews_single_page, should_stop = extract_review_info_in_single_page(reviews_html)
-        review_list += reviews_single_page
+        
+        save_reviews(category_id, product_id, reviews_single_page)
         
         if should_stop == False:
             flag = False
             break
         
-        if _page >= 21:
+        if _page >= 13:
             flag = False
             break
         _page += 1
     if flag == False:
         break
-for i in review_list:
-    print(i['review_user_name'])
+    
+
     
 driver.close()
