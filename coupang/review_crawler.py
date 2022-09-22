@@ -77,18 +77,18 @@ def extract_review_info(_element, _product_id=None):
 def extract_review_info_in_single_page(_elements, _product_id = None):
     '''
     input: list[html element, html element...]
-    output: list[dict, dict...]
+    output: list[dict, dict...], boolean
     '''
-    quality = True
+    should_stop = True
     reviews_info = []
-    for review_html in reviews_html:
-        review_info = extract_review_info(review_html)
+    for review_html in _elements:
+        review_info = extract_review_info(review_html, _product_id)
         if judge_value_of_review(review_info['review_text']) == True:
             reviews_info.append(review_info)
         else:
-            quality = False
+            should_stop = False
     
-    return reviews_info, quality
+    return reviews_info, should_stop
 
 
 subprocess.Popen(r'C:\Program Files\Google\Chrome\Application\chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\chrometemp"')
@@ -115,11 +115,45 @@ driver.find_element(By.XPATH, '//*[@id="btfTab"]/ul[1]/li[2]').click()
 
 reviews_html = driver.find_elements(By.XPATH, '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[4]/article')
 
-reviews_single_page, quality = extract_review_info_in_single_page(reviews_html)
+review_list = []
 
-print(len(reviews_single_page))
+reviews_single_page, should_stop = extract_review_info_in_single_page(reviews_html)
 
-temp = 0
+driver.implicitly_wait(3)
+time.sleep(rantime(1.1, 1.32))
+
+#if should_stop == False:
+#   break
+
+review_list += reviews_single_page
+
+buttons_xpath = '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[4]/div[3]/button'
+num_buttons = len(driver.find_elements(By.XPATH, buttons_xpath))
 
 
+_page = 1
+flag = True
+
+while(1):
+    for aaa in range(3, num_buttons+1):
+        time.sleep(rantime(1.5, 2.0))
+        driver.find_element(By.XPATH, '{}[{}]'.format(buttons_xpath, aaa)).click()
+        time.sleep(rantime(1.9, 2.35))
+        reviews_html = driver.find_elements(By.XPATH, '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[4]/article')
+        reviews_single_page, should_stop = extract_review_info_in_single_page(reviews_html)
+        review_list += reviews_single_page
+        
+        if should_stop == False:
+            flag = False
+            break
+        
+        if _page >= 21:
+            flag = False
+            break
+        _page += 1
+    if flag == False:
+        break
+for i in review_list:
+    print(i['review_user_name'])
+    
 driver.close()
