@@ -144,7 +144,7 @@ def get_reviews_in_single_page(product_id, item_id, page, ratings):
     params['ratings'] = ratings
     headers['referer'] = referer
 
-    response = requests.get('https://www.coupang.com/vp/product/reviews', params=params, cookies=cookies, headers=headers)
+    response = requests.get('https://www.coupang.com/vp/product/reviews', params=params, cookies=cookies, headers=headers, timeout=3)
     
     if response.status_code == 200:
         bad_review = 0
@@ -216,8 +216,8 @@ def get_save_reviews_in_single_product(category_id, product_id, item_id):
                 break
     print("all reviews in product:{} is taken".format(product_id))
     
+    
 category_id = '502382'
 product_id = '1717552921'
 item_id = '2923167957'
-
 get_save_reviews_in_single_product(category_id, product_id, item_id)
