@@ -111,18 +111,24 @@ def extract_review_info_in_single_page(_elements, _product_id = None):
 def save_reviews(_category_id, _product_id, _review_list):
     try:
         dir_loc = '{}/data/coupang/{}/reviews'.format(nowLoc, _category_id)
-        print(dir_loc)
-    
         try:
             dirExist = os.path.exists(dir_loc)
             if not dirExist :
                 os.makedirs(dir_loc)
         except OSError:
                 print("Error: Creating Dir {}".format(dir_loc))
+                
+        try:
+            fileExist = os.path.exists("{}/{}.csv".format(dir_loc, _product_id))
+            if not fileExist:
+                with open('{}/{}.csv'.format(dir_loc, _product_id), 'a', newline='', encoding="utf-8-sig") as f_object:
+                    dictwriter_object = DictWriter(f_object, fieldnames=headersCSV)
+                    dictwriter_object.writeheader()
+        except OSError:
+                print("Error: Creating Csv {}/{}.csv".format(dir_loc, _product_id))
     
         with open('{}/{}.csv'.format(dir_loc, _product_id), 'a', newline='', encoding="utf-8-sig") as f_object:
             dictwriter_object = DictWriter(f_object, fieldnames=headersCSV)
-            dictwriter_object.writeheader()
             for i in _review_list:
                 dictwriter_object.writerow(i)
     except:
