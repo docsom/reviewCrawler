@@ -23,6 +23,8 @@ nowLoc = os.getcwd()
 
 max_num_review = 60
 min_text_len = 50
+category_id = 502382
+product_id = 1717552921
 
 headersCSV = [
     'review_id',
@@ -142,8 +144,10 @@ def save_reviews(_category_id, _product_id, _review_list):
                 dictwriter_object.writerow(i)
     except:
         "I think there is something wrong with saving..."
+        
 
 def get_save_reviews_in_single_product(category_id, product_id):
+    
     url = "https://www.coupang.com/vp/products/{}?itemId=2923167957&vendorItemId=70911802261&sourceType=CATEGORY&categoryId={}&isAddedCart=".format(product_id, category_id)
 
     subprocess.Popen(r'C:\Program Files\Google\Chrome\Application\chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\chrometemp"')
@@ -152,9 +156,52 @@ def get_save_reviews_in_single_product(category_id, product_id):
 
     driver=webdriver.Chrome('./chromedriver.exe', options=options)
     #driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    
+    def get_save_reviews_in_single_product_single_stars():
 
+        reviews_html = driver.find_elements(By.XPATH, '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[4]/article')
+
+        reviews_single_page, should_stop = extract_review_info_in_single_page(reviews_html)
+
+        driver.implicitly_wait(3)
+        time.sleep(rantime(1.1, 1.32))
+
+        #if should_stop == False:
+        #   break
+
+        buttons_xpath = '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[4]/div[3]/button'
+        num_buttons = len(driver.find_elements(By.XPATH, buttons_xpath))
+
+        save_reviews(category_id, product_id, reviews_single_page)
+
+        num_review = 5
+        flag = True
+
+        while(1):
+            for aaa in range(3, num_buttons+1):
+                time.sleep(rantime(1.5, 2.0))
+                driver.find_element(By.XPATH, '{}[{}]'.format(buttons_xpath, aaa)).click()
+                time.sleep(rantime(1.9, 2.35))
+                reviews_html = driver.find_elements(By.XPATH, '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[4]/article')
+                
+                reviews_single_page, should_stop = extract_review_info_in_single_page(reviews_html)
+                save_reviews(category_id, product_id, reviews_single_page)
+                
+                if should_stop == False:
+                    flag = False
+                    break
+                
+                if num_review >= max_num_review:
+                    flag = False
+                    break
+                
+                num_review += 5
+                
+            if flag == False:
+                break
+    
     driver.implicitly_wait(3)
-
+    
     driver.get(url)
     time.sleep(rantime(2.3, 2.7))
 
@@ -165,52 +212,15 @@ def get_save_reviews_in_single_product(category_id, product_id):
     time.sleep(rantime(0.4, 0.6))
 
     driver.find_element(By.XPATH, '//*[@id="btfTab"]/ul[1]/li[2]').click()
+    
+    get_save_reviews_in_single_product_single_stars()
 
-    reviews_html = driver.find_elements(By.XPATH, '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[4]/article')
-
-
-    reviews_single_page, should_stop = extract_review_info_in_single_page(reviews_html)
-
-    driver.implicitly_wait(3)
-    time.sleep(rantime(1.1, 1.32))
-
-    #if should_stop == False:
-    #   break
-
-    buttons_xpath = '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[4]/div[3]/button'
-    num_buttons = len(driver.find_elements(By.XPATH, buttons_xpath))
-
-    save_reviews(category_id, product_id, reviews_single_page)
-
-    num_review = 5
-    flag = True
-
-    while(1):
-        for aaa in range(3, num_buttons+1):
-            time.sleep(rantime(1.5, 2.0))
-            driver.find_element(By.XPATH, '{}[{}]'.format(buttons_xpath, aaa)).click()
-            time.sleep(rantime(1.9, 2.35))
-            reviews_html = driver.find_elements(By.XPATH, '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[4]/article')
-            reviews_single_page, should_stop = extract_review_info_in_single_page(reviews_html)
-            
-            save_reviews(category_id, product_id, reviews_single_page)
-            
-            if should_stop == False:
-                flag = False
-                break
-            
-            if num_review >= max_num_review:
-                flag = False
-                break
-            
-            num_review += 5
-        if flag == False:
-            break
-        
-
-        
     driver.close()
     
-category_id = 502382
-product_id = 1717552921
+
+
+        
+
+    
+
 get_save_reviews_in_single_product(category_id, product_id)
