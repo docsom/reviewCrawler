@@ -43,6 +43,7 @@ def rantime(_min = 0., _max = 1.):
 
 def judge_value_of_review(_text):
     '''
+    리뷰 퀄리티에 따라 더 수집할지 말지를 결정하는 함수
     input: str(review's text)
     output: boolean(if quality is good True else False)
     '''
@@ -57,6 +58,7 @@ def judge_value_of_review(_text):
     
 def extract_review_info(_element, _product_id=None):
     '''
+    각 페이지에서 받아온 html element에서 정보를 뽑아내는 함수
     input: html element
     output: python dictionary
     '''
@@ -94,6 +96,7 @@ def extract_review_info(_element, _product_id=None):
 
 def extract_review_info_in_single_page(_elements, _product_id = None):
     '''
+    한 페이지 전체의 리뷰 정보를 뽑아내는 페이지
     input: list[html element, html element...]
     output: list[dict, dict...], boolean
     '''
@@ -109,6 +112,9 @@ def extract_review_info_in_single_page(_elements, _product_id = None):
     return reviews_info, should_stop
 
 def save_reviews(_category_id, _product_id, _review_list):
+    '''
+    리스트로 들어온 리뷰 info를 저장하는 함수
+    '''
     try:
         dir_loc = '{}/data/coupang/{}/reviews'.format(nowLoc, _category_id)
         try:
@@ -133,7 +139,7 @@ def save_reviews(_category_id, _product_id, _review_list):
                 dictwriter_object.writerow(i)
     except:
         "I think there is something wrong with saving..."
-    
+
 category_id = 502382
 product_id = 1717552921
 url = "https://www.coupang.com/vp/products/{}?itemId=2923167957&vendorItemId=70911802261&sourceType=CATEGORY&categoryId={}&isAddedCart=".format(product_id, category_id)
