@@ -21,7 +21,7 @@ import pandas as pd
 
 nowLoc = os.getcwd()
 
-max_num_review = 60
+max_num_review = 10
 min_text_len = 50
 category_id = 502382
 product_id = 1717552921
@@ -209,12 +209,18 @@ def get_save_reviews_in_single_product(category_id, product_id):
     driver.find_element(By.TAG_NAME, "body").send_keys(Keys.PAGE_DOWN)
     driver.find_element(By.TAG_NAME, "body").send_keys(Keys.PAGE_DOWN)
 
-    time.sleep(rantime(0.4, 0.6))
-
     driver.find_element(By.XPATH, '//*[@id="btfTab"]/ul[1]/li[2]').click()
     
-    get_save_reviews_in_single_product_single_stars()
+    stars_splitters = driver.find_elements(By.XPATH, '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[2]/div[3]/div[2]/ul/li')
+    print(stars_splitters)
+    
+    for splitter in stars_splitters:
+        driver.find_element(By.XPATH, '//*[@id="btfTab"]/ul[2]/li[2]/div/div[6]/section[2]/div[3]').click()
+        splitter.click()
+        time.sleep(rantime(0.2, 0.4))
+        get_save_reviews_in_single_product_single_stars()
 
+    print('category_{}: product_{}, crawling finished'.format(category_id, product_id))
     driver.close()
     
 
