@@ -2,12 +2,32 @@ import requests
 from bs4 import BeautifulSoup
 import json
 from csv import DictWriter
+import os
 
 headersCSV = [
-    "reviewContent",
+    "review_id",
+    "review_user_grade",
+    'review_user_name',
+    "review_time",
+    "review_help_cnt",
+    "review_text",
+    'product_name',
+    "product_id",
+    "review_topics"
 ]
 
-target_url = 'https://smartstore.naver.com/cakefactoryd/products/6960829129'
+
+def get_review_topics(review_text, topics):
+    text = ''
+    for topic in topics:
+        text += '({}){}\n'.format(topic['topicCodeName'],
+                                  review_text[topic['startIdx']:topic['endIdx']+1])
+    return text
+
+
+target_url = 'https://smartstore.naver.com/cakefactoryd/products/6960829129'#'https://smartstore.naver.com/heefoodstory/products/3955378450'
+filename = 'test2.csv'
+file_exist = os.path.isfile(filename)
 
 html = requests.get(target_url).text
 soup = BeautifulSoup(html, 'html.parser')
@@ -44,7 +64,7 @@ json_data = {
     'pageSize': 20,
     'merchantNo': merchant_num,
     'originProductNo': product_num,
-    'sortType': sortType[0],
+    'sortType': sortType[3],
 }
 
 response = requests.post(
@@ -55,18 +75,32 @@ totalPages = data['totalPages']
 # 크롤링할 마지막 페이지, 스마트스토어 리뷰는 천 페이지까지만 조회가능
 lastPage = totalPages if totalPages < 1001 else 1000
 
+f_object = open(filename, 'a', encoding='utf-8-sig', newline='')
+dictwriter_object = DictWriter(f_object, fieldnames=headersCSV)
+if not file_exist:
+    dictwriter_object.writeheader()
+
 for page in range(lastPage):
     print(page)
-    with open('{}.csv'.format('test'), 'a', newline='', encoding="utf-8-sig") as f_object:
-        dictwriter_object = DictWriter(f_object, fieldnames=headersCSV)
-        dictwriter_object.writeheader()
-        for i in range(len(data['contents'])):
-            review = data['contents'][i]["reviewContent"]
-            dict = {'reviewContent': review}
-            dictwriter_object.writerow(dict)
+    for i in range(len(data['contents'])):
+        review = data['contents'][i]
+        dict = {
+            "review_id": review['id'],
+            "review_user_grade": review['reviewScore'],
+            'review_user_name': review['writerMemberId'],
+            "review_time": review['createDate'],
+            "review_help_cnt": review['helpCount'] if 'helpCount' in review.keys() else '0',
+            "review_text": review['reviewContent'],
+            'product_name': review['productName'],
+            "product_id": review['productNo'],
+            "review_topics": get_review_topics(review['reviewContent'], review['reviewTopics']) if 'reviewTopics' in review.keys() else '',
+        }
+        dictwriter_object.writerow(dict)
     json_data['page'] += 1  # 다음 페이지 넘어가기
     if json_data['page'] > lastPage:
         break
     response = requests.post(
         'https://smartstore.naver.com/i/v1/reviews/paged-reviews', headers=headers, json=json_data)
     data = response.json()
+
+f_object.close()
