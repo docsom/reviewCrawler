@@ -1,60 +1,6 @@
 #https://waytothem.com/blog/163/
-
-#from multiprocessing import Pool
-
-#pepp8 해보기 control k fz
-
-#https://www.coupang.com/vp/products/1717552921/items/2923167957/vendoritems/70911802261
-# import json
-# from bs4 import BeautifulSoup
-# import requests
-# import os
-
-# nowLoc = os.getcwd()
-# with open("{}/Coupang/Headers.json".format(nowLoc), 'r') as f_object:
-#     headers = json.load(f_object)
-# class Coupang:
-#     def get_product_code(self, url):
-#         prod_code = url.split('products/')[-1].split('?')[0]
-#         return prod_code
-    
-#     def __init__(self):
-#         self.__headers = headers['headers']
-        
-#     def main(self):
-        
-#         #URL = self.input_review_url()
-#         URL = "https://www.coupang.com/vp/products/6638786505?itemId=15167378523&vendorItemId=82388756551&sourceType=cmgoms&isAddedCart="
-        
-#         prod_code = self.get_product_code(url=URL)
-    
-#         URLS = [f'https://www.coupang.com/vp/product/reviews?productId={prod_code}&amp;page={page}&amp;size=5&amp;sortBy=ORDER_SCORE_ASC&amp;ratings=&amp;q=&amp;viRoleCode=3&amp;ratingSummary=true' for page in range(1,1 + 1)]
-
-        
-#         self.__headers['referer'] = URL
-
-#         print(self.__headers)
-
-#         with requests.Session() as session:
-#             [self.fetch(url=url,session=session) for url in URLS]
-
-#         print("hi")
-#         return None
-        
-#     def fetch(self,url,session):
-#         print("fetch")
-#         with session.get(url=url,headers=self.__headers) as response:
-#             print("response")
-#             html = response.text
-#             soup = BeautifulSoup(html,'html.parser')
-#             print(soup.prettify())
-            
-# coupang = Coupang()
-# coupang.main()
-
-
-
 #https://curlconverter.com/
+
 import requests
 import os
 import pandas as pd
@@ -63,7 +9,8 @@ from csv import DictWriter
 import time
 
 nowLoc = os.getcwd()
-min_text_len = 50
+min_text_len = 1
+max_num_of_review_per_star = 15
 
 headersCSV = [
     'review_id',
@@ -77,6 +24,7 @@ headersCSV = [
     'product_name',
     "product_id"
 ]
+
 cookies = {
     'PCID': '20118162313960784610299',
     'X-CP-PT-locale': 'ko_KR',
@@ -86,7 +34,9 @@ cookies = {
     'x-coupang-origin-region': 'KOREA',
     'x-coupang-target-market': 'KR',
     '_ga': 'GA1.2.644421614.1663552878',
+    'ILOGIN': 'Y',
     'gd1': 'Y',
+    'rememberme': 'true',
     'trac_src': '1042016',
     'trac_spec': '10304903',
     'trac_addtag': '900',
@@ -94,15 +44,18 @@ cookies = {
     'trac_lptag': '%EC%BF%A0%ED%8C%A1',
     'trac_itime': '20220926095636',
     'searchSoterTooltip': 'OFF',
-    'bm_mi': 'F2B9CF442450293E6FBE345640AB306E~YAAQdQI1F6IFOl6DAQAAwmL8dxGMtkQMVY4mvahnTJ483SLRmlqJNhgMb26YNM2kXplUqVoqR6oCKeG7DWugn91LRlLJLxtcfgU8ZsockJYTv4liaoFg6mlmIjhCTP2Q0A7KyHkkTU3IkHEqZ6Wjwz5Yw5r7XsbBOVTKQFZq1gRkh/STOpYVXb762LKsa9wF2OrrL5W6j+apDgAFUu/qP27k+XjlbAlDj9K2xqJsm1CDRtXw5Txgdzx6Eh1ADUbVz/qaylZ27lzJcfsrZwRlKtNgLj9zvLvu9xL5/mQm4wtZNqTZHSoRaFRZy74n+wXz/uUbNqg1lleCh1btSeb/BY0=~1',
-    'ak_bmsc': 'B433A5739E538973951E23833D4C60E0~000000000000000000000000000000~YAAQdQI1F8cYOl6DAQAAcrf8dxGNgpjEzUmHDfD0k/X2bTlKgfck6XgXiGZWeGUCON2fflUNHaoNkvlgjBcH6BnP/90/j3O2c6Bd5FkIqMGkZtcVtkws3/mrytkGRIFjF0OF6BxVMsfcA8dkIBsWm/Z2yHR1YX3xYAN3oPSmmwyJMC2X9iwiX4gmzf85Kb/lKxpINn7XGwzpK1BRitZJ00Z0Bi9uW59mv0XKtXVj+4IkSrofda0Zg25Ss2Pidd3bQR2TM/LZl5+Ls5df0sLvwHK0/kiDDBRqUhIj1Au9suyhNzf/MkIOxuNLm36L3SS2JRVcJVFgWnHLnq5W/Lf5soRMhInityYC8ymeoj5Pek4ozr8+Cae+5GGIVvxSpMY3rw+Iwl0I6bWPXtew/tRrY0nAM4OKkWkPpNpZZLj9NzHFppMAyrADF8crnN48rPZ30nkZIb4JFaU=',
-    'x-coupang-accept-language': 'ko_KR',
-    'overrideAbTestGroup': '%5B%5D',
     'bm_sz': '7749705569E9172FA9005DE0EC0DE358~YAAQbQI1FymRvHCDAQAAaQQleBHPg1RSd45YJATaJes5KGQafo8noUH5hGBYn40iv+BL9gVM6tKVLkNZRDC29rCkzZ6bqDKMIh1ZhRPo1B5VfjvSkr5PpihPDS/kqfrcX128IyGNEWsYSm/nQwappHSZ0NT4M8t/IqVMGnz0qnnh+6o4rAdnPAct30a3ckW9gZS917pWLVFgUdXMx+5EkIgl4vTUkq34OCIXySnWvnPJ36P5f/UjUE3idGVrWkKnjkynCkobZa/UacLQaX1OWcpQ6pI1hlsuvLE7ZAajuLYndk8r9+x0aXNYsrvkvH7tpSXZq/4J+E+qe15F~3163442~4276545',
+    'overrideAbTestGroup': '%5B%5D',
+    'bm_mi': '95634CFF5907175AE08CB9E42082E124~YAAQt5c7Fx4gck+DAQAAdgNteBGbBSCH1h1q/xFvMS1gBtsG4Odw8T7pNy1lHuBVZnXZdQStCyTS+bGkCXqcIR+pzbv1Q9j7fpZE8cLUQT6bqTCH0M51ZNPaxaf45WFRs2tetjWDlJRT0qSI1fvnmkUajj5FhzNSGqqRMC06Z2ban2HHh2+7exkyw3lKN5BTOCFNEwiNp3lZ810VPbrjihgHBwAEpF3+GjynOLVIg2BstF9D1hX/oJJOGVLViHwsy5Uv7jDkoQEciwiqS77lYTim2GI1IX7qUnq5XoZJOy/TBmBxeAPHOitRd22/3B7efP7nKjQSd51tRCpUnuTY2FbaaisgiRVktHTyDvVtRQCqhTuR~1',
+    'ak_bmsc': '27642A0BAA81998174E481E14B9F41E1~000000000000000000000000000000~YAAQt5c7F0Ynck+DAQAAsCNteBEVGBhn+LoeKzqJ+CSlc4l4Vcy4FTS22wkFuUsITFCHoG51YGFuxtvwvMIYT44Vjdp9A54whRw1jK6P2AxNz2Xa2tjGLEr7rZOdu4lKbWQycoVE+uAKiNjVnG05KW9QogizeFUg+v9WjeWUjlPzwyaWBEQCYNbaZUpJtXA6VjfFteWkKf7i7yPjeUyUiMfbmbFm5OMGH2O+sH9SVIM064KD0z2CCHIdKMs535pIG1TVNg5gk3sA8k2hLe06etwEpXZ4EMXUeyImGnZgv+19f0iJOd3Xe5SrzQ+iQgz207K7j6RJbSVSaHb2RWPVdAeV7zgFalsKLSJqUt+2Z+qDPkUguYQSdUUd1rjgJIjxLyYTZyFrv4SzyzBpSTNb1ovLBgrYS91GYYVkU5jgEX5Nn+/R3BpS6IV7qUA39NdlMXjDIu+oOlIfJzVJ/oT/wmaLzBikR1MXtU0KpG8zIAH9V6E3jRWGY0QWAiXQK4s5jcYqCu84oIILq+xTZOpGs4axQQnzJ0rb1zVHQXgMFbXp/KQcxqATag==',
+    'searchKeyword': '%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80%20%EB%8D%94%ED%81%B0%20%ED%96%84%EA%B0%80%EB%93%9D%20%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8',
+    'searchKeywordType': '%7B%22%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80%20%EB%8D%94%ED%81%B0%20%ED%96%84%EA%B0%80%EB%93%9D%20%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8%22%3A0%7D',
+    'FUN': '"{\'search\':[{\'reqUrl\':\'/search.pang\',\'isValid\':true}]}"',
+    'x-coupang-accept-language': 'ko_KR',
     'baby-isWide': 'small',
-    'cto_bundle': 'ysPLul8wSTBCNmtVdmVUT0RCc3Vlc09YVlc4c0Z3MjYzazNqJTJCNXdWTSUyRjJ1OEhaVUJtOUdDbnhxOTlTMFRFNmMlMkZla2tzWDRmZk5UcmtJT3RZQmZSbXJUMnZKdTU1YURLeHR0MTZYeGJKUEFrMUhidk9ZZDNiRVdHd1clMkIxR1VaQ2EwaUxDc2pXdEkxQmQ5Q094RHE5NXB0cFNwQSUzRCUzRA',
-    '_abck': 'B00E0DF2BD0B5CCE34434E7DA8E8E605~0~YAAQZCPJF+q1aGuDAQAAcJc+eAhq0hN3wXlAwGmc7BJ/EpHYqK98BZvrC1DrEWIkI1SjpoG2XORCT0/ihZNe9pokMKQidmEWuc1NLn4HLJAJ1TiJBJL0d/JMkAcsRAZIjX9Tquf1o+kE3LjmPuDqSBUBjmDBhchqeqJ70+5wWS8l6fQs6GKJUqP7u0CJZ74lx1ziFtEZzjvdc7xiUR2k9xAq5QkFnsXfjyQDvlYsMDEoXSI1tj/iCiNF7PuFJSNDbrKTmLkzJiNsdN4DcC8wbGWhHxsyc5aEUEr+8Am5Y+MnWwokTr/YpGDs4KCd82BdYjKkzgSrU0fViNOQVIFbOl1p82teV/WlA27y0nuLKnNbog5uAxIDSG+9skE=~-1~-1~-1',
-    'bm_sv': '31B48C7DA69206183ED35B13A94C00EB~YAAQZCPJF+u1aGuDAQAAcJc+eBH4XLf+Sm9wgV2/N5byDnE0nE4edL5g/IaJRYRowKtgKUNIO+ul/N/2oZ4QGgKya/s0CRL4EQWZ+0CU6YO25b+UzY2dBBrsNH5jp16jjTV1RYIqBNnEnVZ0xy3lX0gScMWjVMrsUO6LltU7gmUnWjlpjh+W3ICSUmWbbPBEq8+e43Xgzd1U+7yQPtijfRl4Azr2saLybOwwpacAl5VS7VwM2GACDyDsxYEfN2KOL6Q=~1',
+    'cto_bundle': 'KKVoOV8wSTBCNmtVdmVUT0RCc3Vlc09YVlcxbDVVWDZPRDB5aFFraDVYbGYwZEFYTVAxS1Vac0YlMkZGMCUyRmc2eUJPN0VvZVJjdncydm1UbDFkWGlRNmp1dWVzR01xeGZGMzNBQk5HZ1NudWxsY3VLQlFQU091ZjJlVUc1ZHFCYVBqNXRsZHJocE9MMSUyQkdWRENGbVB5NWdvYXZpa3clM0QlM0Q',
+    '_abck': 'B00E0DF2BD0B5CCE34434E7DA8E8E605~0~YAAQtwI1F726NHCDAQAAiEV+eAhJzB9Zn3YmDnNhcD7rAtlSng0OQkYib0YkSfKtivF96PBcIsxRDhoYEpd0M/1WAv18/EFLU9dQlQaSRNUaESa3G6+EQwYqsWldQ9pZsFcHeQsjFD9s8LsvxcVfpj9TkNvf6dDo1ic5eyzeV22/WYP7uinWW3N8/vTlSL15PiifKuaOvOEtAaM36Sj9dU7yLpA83cfETbg9Xy538fOCx27PtMMFd+EuHxz9hxxOMP4OnnogJtRywiH3Kduz/pNB5T4iWQtubmVTEWEvoMgmnpwmE/6bSJsqqfq1PNRmxdQ0RfNVSYocKoG+RkC5q/udOP1xsC5m8hOOeWZkVGASAPjmVkUbIYFfLLM=~-1~-1~-1',
+    'bm_sv': '4853930EBB3EC2598A320D85528673F9~YAAQtwI1F766NHCDAQAAiEV+eBH7WUXpfWx3oLch/LsVkodOjBf2IMaM7PnTn7p8xQgOZjIwHTyOmHh9BBotXTqUZjG8/8wnvTcZjPvT12QDeqfA2xI4ZcDRGC62KzRDVaRdljub6gsbj37GDCgGq84GA7RdDc/ZA5W456+HkAqELKoYiKNKID9r0+XbIYpgk7YVi4DGXiyU1GCyqwuLDx6tbtMA35zmMjMfV2RUZ579QGn7ljo1BP+XX4LAaGWU8CM=~1',
 }
 
 headers = {
@@ -110,8 +63,8 @@ headers = {
     'accept': '*/*',
     'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
     # Requests sorts cookies= alphabetically
-    # 'cookie': 'PCID=20118162313960784610299; X-CP-PT-locale=ko_KR; _fbp=fb.1.1659588906314.1251726976; MARKETID=20118162313960784610299; sid=196c96d64d494f0ca994055f6bfb350f6d55a8e9; x-coupang-origin-region=KOREA; x-coupang-target-market=KR; _ga=GA1.2.644421614.1663552878; gd1=Y; trac_src=1042016; trac_spec=10304903; trac_addtag=900; trac_ctag=HOME; trac_lptag=%EC%BF%A0%ED%8C%A1; trac_itime=20220926095636; searchSoterTooltip=OFF; bm_mi=F2B9CF442450293E6FBE345640AB306E~YAAQdQI1F6IFOl6DAQAAwmL8dxGMtkQMVY4mvahnTJ483SLRmlqJNhgMb26YNM2kXplUqVoqR6oCKeG7DWugn91LRlLJLxtcfgU8ZsockJYTv4liaoFg6mlmIjhCTP2Q0A7KyHkkTU3IkHEqZ6Wjwz5Yw5r7XsbBOVTKQFZq1gRkh/STOpYVXb762LKsa9wF2OrrL5W6j+apDgAFUu/qP27k+XjlbAlDj9K2xqJsm1CDRtXw5Txgdzx6Eh1ADUbVz/qaylZ27lzJcfsrZwRlKtNgLj9zvLvu9xL5/mQm4wtZNqTZHSoRaFRZy74n+wXz/uUbNqg1lleCh1btSeb/BY0=~1; ak_bmsc=B433A5739E538973951E23833D4C60E0~000000000000000000000000000000~YAAQdQI1F8cYOl6DAQAAcrf8dxGNgpjEzUmHDfD0k/X2bTlKgfck6XgXiGZWeGUCON2fflUNHaoNkvlgjBcH6BnP/90/j3O2c6Bd5FkIqMGkZtcVtkws3/mrytkGRIFjF0OF6BxVMsfcA8dkIBsWm/Z2yHR1YX3xYAN3oPSmmwyJMC2X9iwiX4gmzf85Kb/lKxpINn7XGwzpK1BRitZJ00Z0Bi9uW59mv0XKtXVj+4IkSrofda0Zg25Ss2Pidd3bQR2TM/LZl5+Ls5df0sLvwHK0/kiDDBRqUhIj1Au9suyhNzf/MkIOxuNLm36L3SS2JRVcJVFgWnHLnq5W/Lf5soRMhInityYC8ymeoj5Pek4ozr8+Cae+5GGIVvxSpMY3rw+Iwl0I6bWPXtew/tRrY0nAM4OKkWkPpNpZZLj9NzHFppMAyrADF8crnN48rPZ30nkZIb4JFaU=; x-coupang-accept-language=ko_KR; overrideAbTestGroup=%5B%5D; bm_sz=7749705569E9172FA9005DE0EC0DE358~YAAQbQI1FymRvHCDAQAAaQQleBHPg1RSd45YJATaJes5KGQafo8noUH5hGBYn40iv+BL9gVM6tKVLkNZRDC29rCkzZ6bqDKMIh1ZhRPo1B5VfjvSkr5PpihPDS/kqfrcX128IyGNEWsYSm/nQwappHSZ0NT4M8t/IqVMGnz0qnnh+6o4rAdnPAct30a3ckW9gZS917pWLVFgUdXMx+5EkIgl4vTUkq34OCIXySnWvnPJ36P5f/UjUE3idGVrWkKnjkynCkobZa/UacLQaX1OWcpQ6pI1hlsuvLE7ZAajuLYndk8r9+x0aXNYsrvkvH7tpSXZq/4J+E+qe15F~3163442~4276545; baby-isWide=small; cto_bundle=ysPLul8wSTBCNmtVdmVUT0RCc3Vlc09YVlc4c0Z3MjYzazNqJTJCNXdWTSUyRjJ1OEhaVUJtOUdDbnhxOTlTMFRFNmMlMkZla2tzWDRmZk5UcmtJT3RZQmZSbXJUMnZKdTU1YURLeHR0MTZYeGJKUEFrMUhidk9ZZDNiRVdHd1clMkIxR1VaQ2EwaUxDc2pXdEkxQmQ5Q094RHE5NXB0cFNwQSUzRCUzRA; _abck=B00E0DF2BD0B5CCE34434E7DA8E8E605~0~YAAQZCPJF+q1aGuDAQAAcJc+eAhq0hN3wXlAwGmc7BJ/EpHYqK98BZvrC1DrEWIkI1SjpoG2XORCT0/ihZNe9pokMKQidmEWuc1NLn4HLJAJ1TiJBJL0d/JMkAcsRAZIjX9Tquf1o+kE3LjmPuDqSBUBjmDBhchqeqJ70+5wWS8l6fQs6GKJUqP7u0CJZ74lx1ziFtEZzjvdc7xiUR2k9xAq5QkFnsXfjyQDvlYsMDEoXSI1tj/iCiNF7PuFJSNDbrKTmLkzJiNsdN4DcC8wbGWhHxsyc5aEUEr+8Am5Y+MnWwokTr/YpGDs4KCd82BdYjKkzgSrU0fViNOQVIFbOl1p82teV/WlA27y0nuLKnNbog5uAxIDSG+9skE=~-1~-1~-1; bm_sv=31B48C7DA69206183ED35B13A94C00EB~YAAQZCPJF+u1aGuDAQAAcJc+eBH4XLf+Sm9wgV2/N5byDnE0nE4edL5g/IaJRYRowKtgKUNIO+ul/N/2oZ4QGgKya/s0CRL4EQWZ+0CU6YO25b+UzY2dBBrsNH5jp16jjTV1RYIqBNnEnVZ0xy3lX0gScMWjVMrsUO6LltU7gmUnWjlpjh+W3ICSUmWbbPBEq8+e43Xgzd1U+7yQPtijfRl4Azr2saLybOwwpacAl5VS7VwM2GACDyDsxYEfN2KOL6Q=~1',
-    'referer': 'https://www.coupang.com/vp/products/293473519?itemId=926572599&isAddedCart=',
+    # 'cookie': 'PCID=20118162313960784610299; X-CP-PT-locale=ko_KR; _fbp=fb.1.1659588906314.1251726976; MARKETID=20118162313960784610299; sid=196c96d64d494f0ca994055f6bfb350f6d55a8e9; x-coupang-origin-region=KOREA; x-coupang-target-market=KR; _ga=GA1.2.644421614.1663552878; gd1=Y; trac_src=1042016; trac_spec=10304903; trac_addtag=900; trac_ctag=HOME; trac_lptag=%EC%BF%A0%ED%8C%A1; trac_itime=20220926095636; searchSoterTooltip=OFF; bm_sz=7749705569E9172FA9005DE0EC0DE358~YAAQbQI1FymRvHCDAQAAaQQleBHPg1RSd45YJATaJes5KGQafo8noUH5hGBYn40iv+BL9gVM6tKVLkNZRDC29rCkzZ6bqDKMIh1ZhRPo1B5VfjvSkr5PpihPDS/kqfrcX128IyGNEWsYSm/nQwappHSZ0NT4M8t/IqVMGnz0qnnh+6o4rAdnPAct30a3ckW9gZS917pWLVFgUdXMx+5EkIgl4vTUkq34OCIXySnWvnPJ36P5f/UjUE3idGVrWkKnjkynCkobZa/UacLQaX1OWcpQ6pI1hlsuvLE7ZAajuLYndk8r9+x0aXNYsrvkvH7tpSXZq/4J+E+qe15F~3163442~4276545; overrideAbTestGroup=%5B%5D; bm_mi=95634CFF5907175AE08CB9E42082E124~YAAQt5c7Fx4gck+DAQAAdgNteBGbBSCH1h1q/xFvMS1gBtsG4Odw8T7pNy1lHuBVZnXZdQStCyTS+bGkCXqcIR+pzbv1Q9j7fpZE8cLUQT6bqTCH0M51ZNPaxaf45WFRs2tetjWDlJRT0qSI1fvnmkUajj5FhzNSGqqRMC06Z2ban2HHh2+7exkyw3lKN5BTOCFNEwiNp3lZ810VPbrjihgHBwAEpF3+GjynOLVIg2BstF9D1hX/oJJOGVLViHwsy5Uv7jDkoQEciwiqS77lYTim2GI1IX7qUnq5XoZJOy/TBmBxeAPHOitRd22/3B7efP7nKjQSd51tRCpUnuTY2FbaaisgiRVktHTyDvVtRQCqhTuR~1; ak_bmsc=27642A0BAA81998174E481E14B9F41E1~000000000000000000000000000000~YAAQt5c7F0Ynck+DAQAAsCNteBEVGBhn+LoeKzqJ+CSlc4l4Vcy4FTS22wkFuUsITFCHoG51YGFuxtvwvMIYT44Vjdp9A54whRw1jK6P2AxNz2Xa2tjGLEr7rZOdu4lKbWQycoVE+uAKiNjVnG05KW9QogizeFUg+v9WjeWUjlPzwyaWBEQCYNbaZUpJtXA6VjfFteWkKf7i7yPjeUyUiMfbmbFm5OMGH2O+sH9SVIM064KD0z2CCHIdKMs535pIG1TVNg5gk3sA8k2hLe06etwEpXZ4EMXUeyImGnZgv+19f0iJOd3Xe5SrzQ+iQgz207K7j6RJbSVSaHb2RWPVdAeV7zgFalsKLSJqUt+2Z+qDPkUguYQSdUUd1rjgJIjxLyYTZyFrv4SzyzBpSTNb1ovLBgrYS91GYYVkU5jgEX5Nn+/R3BpS6IV7qUA39NdlMXjDIu+oOlIfJzVJ/oT/wmaLzBikR1MXtU0KpG8zIAH9V6E3jRWGY0QWAiXQK4s5jcYqCu84oIILq+xTZOpGs4axQQnzJ0rb1zVHQXgMFbXp/KQcxqATag==; searchKeyword=%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80%20%EB%8D%94%ED%81%B0%20%ED%96%84%EA%B0%80%EB%93%9D%20%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8; searchKeywordType=%7B%22%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80%20%EB%8D%94%ED%81%B0%20%ED%96%84%EA%B0%80%EB%93%9D%20%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8%22%3A0%7D; FUN="{\'search\':[{\'reqUrl\':\'/search.pang\',\'isValid\':true}]}"; x-coupang-accept-language=ko_KR; baby-isWide=small; cto_bundle=KKVoOV8wSTBCNmtVdmVUT0RCc3Vlc09YVlcxbDVVWDZPRDB5aFFraDVYbGYwZEFYTVAxS1Vac0YlMkZGMCUyRmc2eUJPN0VvZVJjdncydm1UbDFkWGlRNmp1dWVzR01xeGZGMzNBQk5HZ1NudWxsY3VLQlFQU091ZjJlVUc1ZHFCYVBqNXRsZHJocE9MMSUyQkdWRENGbVB5NWdvYXZpa3clM0QlM0Q; _abck=B00E0DF2BD0B5CCE34434E7DA8E8E605~0~YAAQtwI1F726NHCDAQAAiEV+eAhJzB9Zn3YmDnNhcD7rAtlSng0OQkYib0YkSfKtivF96PBcIsxRDhoYEpd0M/1WAv18/EFLU9dQlQaSRNUaESa3G6+EQwYqsWldQ9pZsFcHeQsjFD9s8LsvxcVfpj9TkNvf6dDo1ic5eyzeV22/WYP7uinWW3N8/vTlSL15PiifKuaOvOEtAaM36Sj9dU7yLpA83cfETbg9Xy538fOCx27PtMMFd+EuHxz9hxxOMP4OnnogJtRywiH3Kduz/pNB5T4iWQtubmVTEWEvoMgmnpwmE/6bSJsqqfq1PNRmxdQ0RfNVSYocKoG+RkC5q/udOP1xsC5m8hOOeWZkVGASAPjmVkUbIYFfLLM=~-1~-1~-1; bm_sv=4853930EBB3EC2598A320D85528673F9~YAAQtwI1F766NHCDAQAAiEV+eBH7WUXpfWx3oLch/LsVkodOjBf2IMaM7PnTn7p8xQgOZjIwHTyOmHh9BBotXTqUZjG8/8wnvTcZjPvT12QDeqfA2xI4ZcDRGC62KzRDVaRdljub6gsbj37GDCgGq84GA7RdDc/ZA5W456+HkAqELKoYiKNKID9r0+XbIYpgk7YVi4DGXiyU1GCyqwuLDx6tbtMA35zmMjMfV2RUZ579QGn7ljo1BP+XX4LAaGWU8CM=~1',
+    'referer': 'https://www.coupang.com/vp/products/1717552921?itemId=2923167957&vendorItemId=70911802261&pickType=COU_PICK&q=%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80+%EB%8D%94%ED%81%B0+%ED%96%84%EA%B0%80%EB%93%9D+%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8&itemsCount=21&searchId=1032de1086f04364816de479fe55e46d&rank=0&isAddedCart=',
     'sec-ch-ua': '"Google Chrome";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
@@ -122,22 +75,15 @@ headers = {
 }
 
 params = {
-    'productId': '293473519',
+    'productId': '1717552921',
     'page': '1',
     'size': '5',
     'sortBy': 'ORDER_SCORE_ASC',
-    'ratings': '5',
+    'ratings': '',
     'q': '',
     'viRoleCode': '3',
     'ratingSummary': 'true',
 }
-
-product_id = '293473519'
-item_id = '926572599'
-page = '1'
-size = '5'
-ratings = '5'
-referer = 'https://www.coupang.com/vp/products/{}?itemId={}&isAddedCart='.format(product_id, item_id)
 
 def extract_review_info(review_html, _product_id=None):
     '''
@@ -191,11 +137,10 @@ def judge_value_of_review(_text):
         return False
     
     
-def get_reviews_in_single_page(product_id, item_id, page, size, ratings):
+def get_reviews_in_single_page(product_id, item_id, page, ratings):
     referer = 'https://www.coupang.com/vp/products/{}?itemId={}&isAddedCart='.format(product_id, item_id)
     params['productId'] = product_id
     params['page'] = page
-    params['size'] = size
     params['ratings'] = ratings
     headers['referer'] = referer
 
@@ -210,13 +155,12 @@ def get_reviews_in_single_page(product_id, item_id, page, size, ratings):
         review_htmls = bsObject.select('article.sdp-review__article__list')
         for review_html in review_htmls:
             review_info = extract_review_info(review_html, product_id)
-            review_list.append(review_info)
             if judge_value_of_review(review_info['review_text']) == True:
                 review_list.append(review_info)
             else:
                 bad_review += 1
                 
-        if bad_review >= 2:
+        if len(review_list) <= 2:
             should_stop = True
         else:
             should_stop = False
@@ -254,7 +198,26 @@ def save_reviews(_category_id, _product_id, _review_list):
             for i in _review_list:
                 dictwriter_object.writerow(i)
     except:
-        "I think there is something wrong with saving..."
+        print("I think there is something wrong with saving...")
+
+
+def get_save_reviews_in_single_product(category_id, product_id, item_id):
+    for ratings in range(1, 6):
+        page = 0
+        num_of_review_per_star = 0
+        while 1:
+            page += 1
+            review_list, should_stop = get_reviews_in_single_page(product_id, item_id, page, str(ratings))
+            save_reviews(category_id, product_id, review_list)
+            num_of_review_per_star += len(review_list)
+            if should_stop == True:
+                break
+            if num_of_review_per_star >= max_num_of_review_per_star:
+                break
+    print("all reviews in product:{} is taken".format(product_id))
     
-    
-get_reviews_in_single_page(product_id, item_id, page, size, ratings)
+category_id = '502382'
+product_id = '1717552921'
+item_id = '2923167957'
+
+get_save_reviews_in_single_product(category_id, product_id, item_id)
