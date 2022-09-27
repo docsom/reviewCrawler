@@ -206,6 +206,8 @@ def save_reviews(_category_id, _product_id, _review_list):
             dictwriter_object = DictWriter(f_object, fieldnames=headersCSV)
             for i in _review_list:
                 dictwriter_object.writerow(i)
+    except KeyboardInterrupt:
+        raise KeyboardInterrupt
     except:
         print("I think there is something wrong with saving...")
 
@@ -281,6 +283,10 @@ def get_save_reviews_in_given_products(category_id, target_products):
         try:
             get_save_reviews_in_single_product(category_id, product_id, item_id)
             record_log_of_single_product_status(category_id, product_id, "Done")
+        except KeyboardInterrupt:
+            print("KeyboardInterrupt Occurred")
+            record_log_of_single_product_status(category_id, product_id, "KeyboardInterrupt")
+            break
         except TimeoutError:
             print("TimeOutError Occurred")
             record_log_of_single_product_status(category_id, product_id, "TimeOutError")
