@@ -10,7 +10,6 @@ import time
 import random
 from datetime import datetime
 
-
 def rantime(_min = 0., _max = 1.):
     num = random.random()
     return _min + num * (_max - _min)
@@ -58,18 +57,18 @@ cookies = {
     'searchKeywordType': '%7B%22%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80%20%EB%8D%94%ED%81%B0%20%ED%96%84%EA%B0%80%EB%93%9D%20%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8%22%3A0%7D',
     '_abck': 'B00E0DF2BD0B5CCE34434E7DA8E8E605~0~YAAQvwI1F2ANDXODAQAA/YZzfQjd2M+jIPrK9pjQDvRxp4+hr8ZxOoMxqjiCJ3LkiQVb5Nd9srLZfSUlCsEDhssFIWFfoIxzQQ6YKo1UgCSdxFwGEk61FzdzjwONHDhWXjWn3XqHDonB98/p7908ewaiRaORSseHoR2gDweQCvlR16H07EaQ9IJk/DjWSi/eSFQFo7nNlQ7NJS5sNjgasTS+67OEOAUa2tWO7rY1tED9KO/+K3pJ66MeFqla5fGbXhieEQma6rj24pXJiMcvNWem07OdwMknUOeJ6vczFuBLKl+DMS618TXfGveGlDPSBa1dAtMPkae6zVR5ao0SFoZIZcfQEQgM4Bp+77DD5ET8ue9dqcFOK9cd5xQJPHuwi2aTdpa8Bw/7WZnZEarGKQYIMwYZ5w==~-1~-1~-1',
     'bm_sz': '76E6FDD83B03B4AE3D4243934E29189B~YAAQvwI1F2MNDXODAQAA/YZzfRHWmRguDdLOxe+ROouNvxZEH1/zltpJshM9Cobkrn/ZqkF2DvA7HylcuXQCCDL8wSmuuXFoIrtTJEBdXOccleF/r37tIhS47x1p0QTaQnw4vB5nst5+vu6TJ3vHvQKdTVY2hUfOen5TslvIfsuKqM633Ea+wHI0pma6dxjzEKvrRsTphSsVmJzdozdXlaZNpYzsV1glXbFAaLxCJnHCXRTQud4hbwLfvqnM3iHfsuPg1xcKvWHzL4w0TRfI5z7yXi81vEMqIWL85mqtB7JLI3S3~3425335~3687218',
-    'bm_mi': '0DA29EEE7A34645D85CFC29BFD281F3D~YAAQvwI1FzAPDXODAQAAMotzfRFJRSkmV1RxWRsUyoZlSAXN2N5qEASn9AMQE0HSeun1GcOQZvr77qWhBVZbjOV3ybLVub6YNbMv1WMnjv3mSfMjSKhcJuASRTcwzuObCwFY6ikc3IPCQx0GefTvzrbB2ucT/VAAg7BWR1B4cad8/htZEwuotCjWMb5jtDi34WU2ei9Se1gGHEJozv4Qo00oYaZW9S6ddZnUK8JBQdbvJh6X8eaY0xCfq4cju2rE3CZ4nriSOudaVcVVgMS2MOyzHcHmR1Tl5UsTJFNBAEy6wDoeL3mZLDxJRtjvK9bOOdJRP92/Cbpn2eNHubi5OiTRoe4+emhX3rvofLiEQ/8jUusA~1',
-    'ak_bmsc': '139DB99AC37B16B091711485739CEC2B~000000000000000000000000000000~YAAQvwI1FxAQDXODAQAAi41zfRG5z8PruKyGuqt4i2pazxxOYUtdj8cusmMNklCXtr/9sWm9FnYkX90fqhbq9g+93CUjPnXN+iuyEO7omJ9qvoMOXwvXnMLYZRwu3i7BAomxNJwyhyaqUz89X87IqbF4WMXK8aoSsR0POD3Nq8a1GJeH4MrBhKWDqfKBvrq0coky9f3UeaygA9WPNMzVEDYDu//LAoJc2XMsM7RZoBpygkTK4J+gG1R6XyEyeh/QCnV9PxmIXJo59iDunnBFIzFBlF4PAW6muc6Bm1BclESHlRc13faSbFfWOxCL39/3LOWwyx1BQ3aYegCSoOlO/fLVNJ7TJO98LbyUJZDItPbtnWBrYtrz3nuJP7pkItN4m91ePfcgr40ZoMhyCIRMDt1hG3thBXLw+vOPHvU9C18fTKTn+cRANLFhO5KwUFx76zHACkygEZrbwXias3RaGbHVA6XXmh2NgDq45o85UA1RzC3HkP5WiRYlIwxtDn6EwwB/2eujPCgaOs4bdowQ6t4leJhT+NXLAmy5+jIomKSlwWGM9gkMxw==',
-    'overrideAbTestGroup': '%5B%5D',
     'trac_spec': '10304903',
     'trac_lptag': '%EC%BF%A0%ED%8C%A1',
-    'trac_itime': '20220927161435',
     'searchSoterTooltip': 'OFF',
-    'CLICKED_PRODUCT_ID': '5838527304',
+    'bm_mi': '2EB8D7FDA951D548CA8F2A3DF980CAB4~YAAQdHpGaAUYA1iDAQAAE03ifRE7t2vYh/zCmJspZE/GXymu8A78EmmlsBm20WzUhdt4IpONzg36M9ihcF0e0VaZno+0H+C61QW1XAOXvg2w45WU7zTDtcCKXrkLP/ZF8iouDX+9c2eQlYNklcU0315v0YDeB+BAqzGRyJvVyYOq+nmGgagCdEx5QhSRbTTc52WUiKH+J28hbTBiI7V7RnShNPABzkUnf7j9SpqJvaCyioWXUtkyVwvsfKgE0iLLakza2C4B9OrUWCg8myxRpAN52Rqi4TQkTWii0XWxTkhvPMB9900ryoHxNfTDc5jhbkCKe6CEn2JvUx2kKQEWLK2tEKJLmP3qZnDDN1QxtsIasHPX~1',
+    'ak_bmsc': '39F08B5E0AB559174408003ABADC533D~000000000000000000000000000000~YAAQdHpGaFEYA1iDAQAALU7ifRF8XEQR2Bpd8O1q4fcWPVLcuAK+zhoOOaIXTUiqEs7FxRJL2kIxg7rt1gdGphtfdmbNrEN9I8Q92npII/Zh52lWDT4FPUM/dJ5iZipQDJze1c0G3lxTfH79BNo5CkFJf2Ty78ZmEfm+bnxK9LZVcDS+UpAwhgysZ7ACLQwg/yQHVEwndlGU1GaIpC1gd+neNB+R9BBYkpZg+CDc7+dHkS6FsTsJWLg6gWPVH/4OrCJzdpdENUKistE2s9BpaaLUOq9kvYVlTXsM92ScU4tJqxeRQHpZeVkvuo5rAtzbuiGe7kcLwDo2deaFGBFBVdimUgnQpqUpR4AniRY7VbXkciZva2PQ6cxOqsoYXQ+9RLmEiSrv1iL7KV3A75dTZ6RiekhcRevT9hqIWTxpMmRABPA/8EeJTPWULaAPUaadDrSEfHfuUEN67QeNxY4wAEL2NmDYsGAZyv1cFeDkei45vWf/5iaBmavP0X6VP9Vd71b/R2QONNWnyTSktvjKAcpjpLGARq4xZW+mIYQBURo3IzSOB5zfrA==',
+    'overrideAbTestGroup': '%5B%5D',
+    'trac_itime': '20220927171544',
+    'CLICKED_PRODUCT_ID': '1465379083',
     'x-coupang-accept-language': 'ko_KR',
     'baby-isWide': 'small',
-    'cto_bundle': 'GdSr_V8wSTBCNmtVdmVUT0RCc3Vlc09YVlcwV1RHckNXbmJ4TjhFWmZZdnNiOU1ySW9JeUt5aFRScDVXVDhTUVg5aHRTbjlISHJLWlh0bFlrbUlkJTJGbUlMcXdtdWdGeVAzdXppMnJnRTV1dmkxcG1udGVsd3duOXJSbiUyQnhWMkI4dVZ0dXo3dTBiUE5rVkdXaHlPMGZkTXZ5QVBnJTNEJTNE',
-    'bm_sv': 'E2E5961FBD723C22DAD873C884DFBB19~YAAQjwI1F8eMMHODAQAAFZrMfREgKBaUcvbx0jhC7iIK9yfSTXh71NQ9r3hybGLGJ81mZ5bvKfyYpdQSC4CtRWc4AD9rSC4zoog5TzWK/5DWoB3sTE1PlDUJCCE7LDbxLMU9TMEGdeRUVFjRfFjGNzIGQKVrylJY2/9GEn9PuaiGyL6I5HERD46V/Wh5sP4K7KoAX4H9PnZyA2e6QbGUgl06e9CHmUKjRaRlH1RGF0lzw2hMcsh52BI6ymdJ6pdcxeg=~1',
+    'cto_bundle': 'Wp5dm18wSTBCNmtVdmVUT0RCc3Vlc09YVlc5SXRpS2lYN3I2MXQxQzhVZjdTMkh1SlNmNFhHZDg4R1RMZ1hLUUhSODZwVzRxMTI1NzhOenR2aExIaU5nZE5qSTElMkJtR3Mya3dCM2l0cURIZVNsanVPaFFxJTJCU1dVa0R0Z25SQzNWY1VxU01oSmFnWVpHa090dndIRmRsOHlmSHZBJTNEJTNE',
+    'bm_sv': 'A6C492481096B28EDDED97705DACA238~YAAQRgI1F4qagnKDAQAAz10EfhFqgiN8koUKU/wHJFUue47VF9RdwunPc/+FxacDzlUrmq8TEp/gvqBEwEooGinqKjMDHsGcPpBVnl0o68YAVfvso1YXh6fLIZ41QDqcukpQb+wVQJF/FIcceAgUTUNrp1oTEjBOUu07Ho0rWGGfX/3rugptsuRjfrr1/fzN7WvREItZO0eFnm73JHyTIVWDGcURzeRpUzlriGY2ppBr0hc0e5zDVgThGeIsbfEvz/c=~1',
 }
 
 headers = {
@@ -292,12 +291,13 @@ def get_save_reviews_in_given_products(category_id, target_products):
             print("KeyboardInterrupt Occurred")
             record_log_of_single_product_status(category_id, product_id, "KeyboardInterrupt")
             break
-        except TimeoutError:
-            print("TimeOutError Occurred")
-            record_log_of_single_product_status(category_id, product_id, "TimeOutError")
-            break
         except:
             record_log_of_single_product_status(category_id, product_id, "Error")
+        # except ReadTimeout:
+        #     print("TimeOutError Occurred")
+        #     record_log_of_single_product_status(category_id, product_id, "TimeOutError")
+        #     break
+
     
 # category_id = '225481'
 # target_products = get_target_products_info_in_single_category(category_id)
