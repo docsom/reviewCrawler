@@ -3,9 +3,24 @@ import os
 import pandas as pd
 from bs4 import BeautifulSoup
 from csv import DictWriter
+from category_id_info import product_category_splited_section
 import time
+import random
 
 nowLoc = os.getcwd()
+
+max_product_info = 100
+
+headersCSV = [
+    'category_id',
+    'product_id',
+    'item_id',
+    'vendor_item_id',
+    'product_name',
+    'product_price',
+    'average_star',
+    'rating_count',
+]
 
 cookies = {
     'PCID': '20118162313960784610299',
@@ -20,22 +35,22 @@ cookies = {
     'trac_src': '1042016',
     'trac_addtag': '900',
     'trac_ctag': 'HOME',
-    'searchSoterTooltip': 'OFF',
     'searchKeyword': '%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80%20%EB%8D%94%ED%81%B0%20%ED%96%84%EA%B0%80%EB%93%9D%20%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8',
     'searchKeywordType': '%7B%22%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80%20%EB%8D%94%ED%81%B0%20%ED%96%84%EA%B0%80%EB%93%9D%20%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8%22%3A0%7D',
-    'FUN': '"{\'search\':[{\'reqUrl\':\'/search.pang\',\'isValid\':true}]}"',
-    'trac_spec': '10304902',
-    'trac_lptag': 'coupang',
-    'trac_itime': '20220926164908',
+    '_abck': 'B00E0DF2BD0B5CCE34434E7DA8E8E605~0~YAAQvwI1F2ANDXODAQAA/YZzfQjd2M+jIPrK9pjQDvRxp4+hr8ZxOoMxqjiCJ3LkiQVb5Nd9srLZfSUlCsEDhssFIWFfoIxzQQ6YKo1UgCSdxFwGEk61FzdzjwONHDhWXjWn3XqHDonB98/p7908ewaiRaORSseHoR2gDweQCvlR16H07EaQ9IJk/DjWSi/eSFQFo7nNlQ7NJS5sNjgasTS+67OEOAUa2tWO7rY1tED9KO/+K3pJ66MeFqla5fGbXhieEQma6rj24pXJiMcvNWem07OdwMknUOeJ6vczFuBLKl+DMS618TXfGveGlDPSBa1dAtMPkae6zVR5ao0SFoZIZcfQEQgM4Bp+77DD5ET8ue9dqcFOK9cd5xQJPHuwi2aTdpa8Bw/7WZnZEarGKQYIMwYZ5w==~-1~-1~-1',
+    'bm_sz': '76E6FDD83B03B4AE3D4243934E29189B~YAAQvwI1F2MNDXODAQAA/YZzfRHWmRguDdLOxe+ROouNvxZEH1/zltpJshM9Cobkrn/ZqkF2DvA7HylcuXQCCDL8wSmuuXFoIrtTJEBdXOccleF/r37tIhS47x1p0QTaQnw4vB5nst5+vu6TJ3vHvQKdTVY2hUfOen5TslvIfsuKqM633Ea+wHI0pma6dxjzEKvrRsTphSsVmJzdozdXlaZNpYzsV1glXbFAaLxCJnHCXRTQud4hbwLfvqnM3iHfsuPg1xcKvWHzL4w0TRfI5z7yXi81vEMqIWL85mqtB7JLI3S3~3425335~3687218',
+    'bm_mi': '0DA29EEE7A34645D85CFC29BFD281F3D~YAAQvwI1FzAPDXODAQAAMotzfRFJRSkmV1RxWRsUyoZlSAXN2N5qEASn9AMQE0HSeun1GcOQZvr77qWhBVZbjOV3ybLVub6YNbMv1WMnjv3mSfMjSKhcJuASRTcwzuObCwFY6ikc3IPCQx0GefTvzrbB2ucT/VAAg7BWR1B4cad8/htZEwuotCjWMb5jtDi34WU2ei9Se1gGHEJozv4Qo00oYaZW9S6ddZnUK8JBQdbvJh6X8eaY0xCfq4cju2rE3CZ4nriSOudaVcVVgMS2MOyzHcHmR1Tl5UsTJFNBAEy6wDoeL3mZLDxJRtjvK9bOOdJRP92/Cbpn2eNHubi5OiTRoe4+emhX3rvofLiEQ/8jUusA~1',
+    'ak_bmsc': '139DB99AC37B16B091711485739CEC2B~000000000000000000000000000000~YAAQvwI1FxAQDXODAQAAi41zfRG5z8PruKyGuqt4i2pazxxOYUtdj8cusmMNklCXtr/9sWm9FnYkX90fqhbq9g+93CUjPnXN+iuyEO7omJ9qvoMOXwvXnMLYZRwu3i7BAomxNJwyhyaqUz89X87IqbF4WMXK8aoSsR0POD3Nq8a1GJeH4MrBhKWDqfKBvrq0coky9f3UeaygA9WPNMzVEDYDu//LAoJc2XMsM7RZoBpygkTK4J+gG1R6XyEyeh/QCnV9PxmIXJo59iDunnBFIzFBlF4PAW6muc6Bm1BclESHlRc13faSbFfWOxCL39/3LOWwyx1BQ3aYegCSoOlO/fLVNJ7TJO98LbyUJZDItPbtnWBrYtrz3nuJP7pkItN4m91ePfcgr40ZoMhyCIRMDt1hG3thBXLw+vOPHvU9C18fTKTn+cRANLFhO5KwUFx76zHACkygEZrbwXias3RaGbHVA6XXmh2NgDq45o85UA1RzC3HkP5WiRYlIwxtDn6EwwB/2eujPCgaOs4bdowQ6t4leJhT+NXLAmy5+jIomKSlwWGM9gkMxw==',
     'overrideAbTestGroup': '%5B%5D',
-    'bm_sz': '9C2FF18EC7201D94B4C8AA91A99154FD~YAAQ1pc7F+Ne63GDAQAAxL74eBHPtrl8xhG+SXkt32gMnizPcd2Xc7P7tnzcuO5WRznd9x9PkhtEwIq5uLc0Jw9NxQEP5zJi0Nt5125uGVgEsvUlTDZrMmdRf5qGteSRWPk8NYbAaQmYZB50pIKa3wissGBIe4FfXzVjsl7KcTm1us+aovqUfcUORk4qWHvxL5573OzQHVsHkcxB6vDA9YhLKTVb1lieEHrclHywz5hhZvygf4v6gHGkrD7QZIS+qA0AeZIAUdv6uvkYzrVf23OP1yB/ailztm2phhHeDl2J2X8zXDKVnQLtsfm3limRTKJ1504CszP3f/1C~4277040~4604227',
+    'trac_spec': '10304903',
+    'trac_lptag': '%EC%BF%A0%ED%8C%A1',
+    'trac_itime': '20220927161435',
+    'searchSoterTooltip': 'OFF',
+    'CLICKED_PRODUCT_ID': '5838527304',
+    'x-coupang-accept-language': 'ko_KR',
     'baby-isWide': 'small',
-    'bm_sv': '252B6591B7F3B2775E0B8D08BE30332D~YAAQ1pc7F29f63GDAQAAocH4eBHIzjXcMUaZs/LGtjPAmWbJK9WnRFvi8xeQTtNRS9BIzbSN05xedrNlirG2GKp/VKuYIiNWSmM5SWPq+S7VBowt+Ny/WhEDghCDHBPH+hOjhXwHlHKFlZW/MSreP+qG6GIURpFDGfwIsXe1iMx6XrDwAf98YZ7o3VQZ8UqyPDybcb8Xvky8GLVq90ASZY2IeUCZfCEO0jwipnp/ylTrryinceM6/iUwS3cqtfFcAQ==~1',
-    'cto_bundle': 'xNyobF8wSTBCNmtVdmVUT0RCc3Vlc09YVld4NHhjQ0tQNEFjUjAzS2NoZ0Q2SmVqQ0F4Qnc2ME45TCUyQkVCTndhTnVoNlZFbjZmVElndWxsZzdDZmlpbFcxbkt2YU41UnMlMkJLQTFvZ1c3QVo0TmJ5NldBejRBMkh0byUyRiUyRiUyQmFvTWt2eiUyQjV4aE5FRnZNVUNrSFdPeU9uQURHYU4lMkJUZyUzRCUzRA',
-    '_abck': 'B00E0DF2BD0B5CCE34434E7DA8E8E605~0~YAAQ1pc7F31f63GDAQAAycH4eAhmN0chRARSRwahhjEaorHNyCQwDz6xB+NDAwBieevt6hik8iojSjXtBh1g0NiRWS4MMwk4L256qBPKmDWwTpieeIBW/JlgN82Brkt9A/bbKHdpGl3ilAh9X4HOPdIBm5/iATs9CuONAUFWI2xD/vZ5tfjN9sHIcFqWPd7CjL5uI/f0zC1AteftDqUVj9UtyhYxOwiLISJkad08wSRo0o94VZAgnjgqu3Tper/zxIzjPBeBVlRwaqskDbsIjXGlcp9eJGcqzER3MbvtPriZUQ/d4EHNqAuCG0xf5ggWn/Ss9WN3UwTB4qdPm24Gbr4RSxzhBCBcVpz1jvDUKDTP0BqE2RhPoxQ4QLI=~-1~-1~-1',
-    'x-coupang-accept-language': 'ko-KR',
-    'ak_bmsc': 'F2CB48D31C310FC26FD24AEFA8BF581E~000000000000000000000000000000~YAAQ1pc7F5Vf63GDAQAALML4eBErwwo+WOX+Evn83hi9PYW7RHBc+ym0wO+bw2S2X6v4JTC0q2PvHSa355oIdKzitpg7qAbyO1nJiqvQ64ki2APibcHDoM5I+bDtS7+EnyvzrBYh+ZQIi44MEYdKBtZyepjVYqt5P6B++40mxYSzQ6wzKsj25TdZTcZkb+s2zFeWXTp7ZnvNeDXOXW1fkdagip0DCEoPTXwL3rDRW/Dp7ClmcUbvweI+OrBF3m7IIof6kJvlMUQmWcWQVba+tnGIxl/9QAnG0RrS//9lXq+/1BlA1jHwqLibZqH/6CEC+5N+MwsQ9iRiFd+QzybaNKYIQ09xJBQey1O9iDCcKiXEfPNJ1/6dZ86imsNHVoGa2uhAuIcqrvk5RFWkR+g8lg1TXlCvQtivIKNcyBCdqu2YrG2X6YlPUZG6n6jFcOTJVZSYTl7+kHZdFnA5yry0kG7VpBGaFKgeG+64Uf2J25txvE6o1UH3f/kqshWr',
-    'CLICKED_PAGE': '2',
+    'cto_bundle': 'GdSr_V8wSTBCNmtVdmVUT0RCc3Vlc09YVlcwV1RHckNXbmJ4TjhFWmZZdnNiOU1ySW9JeUt5aFRScDVXVDhTUVg5aHRTbjlISHJLWlh0bFlrbUlkJTJGbUlMcXdtdWdGeVAzdXppMnJnRTV1dmkxcG1udGVsd3duOXJSbiUyQnhWMkI4dVZ0dXo3dTBiUE5rVkdXaHlPMGZkTXZ5QVBnJTNEJTNE',
+    'bm_sv': 'E2E5961FBD723C22DAD873C884DFBB19~YAAQjwI1F8eMMHODAQAAFZrMfREgKBaUcvbx0jhC7iIK9yfSTXh71NQ9r3hybGLGJ81mZ5bvKfyYpdQSC4CtRWc4AD9rSC4zoog5TzWK/5DWoB3sTE1PlDUJCCE7LDbxLMU9TMEGdeRUVFjRfFjGNzIGQKVrylJY2/9GEn9PuaiGyL6I5HERD46V/Wh5sP4K7KoAX4H9PnZyA2e6QbGUgl06e9CHmUKjRaRlH1RGF0lzw2hMcsh52BI6ymdJ6pdcxeg=~1',
 }
 
 headers = {
@@ -60,40 +75,142 @@ params = {
     'page': '2',
 }
 
-def extract_product_info(product_html):
+
+def rantime(_min = 0., _max = 1.):
+    num = random.random()
+    return _min + num * (_max - _min)
+
+
+def extract_product_info(product_html, category_id):
     product_id = product_html['data-product-id']
+    vendor_item_id = product_html['data-vendor-item-id']
     item_id = product_html.select_one('a.baby-product-link')['data-item-id']
-    product_name = product_html.select_one('div.name').get_text().strip()
-    rating_count = product_html.select_one('span.rating-total-count').get_text().lstrip('(').rstrip(')')
+    product_name = product_html.select_one('div.name')
+    product_name = product_name.get_text().strip() if product_name != None else None
+    product_price = product_html.select_one('strong.price-value')
+    product_price = product_price.get_text().strip() if product_price != None else None
+    average_star = product_html.select_one('em.rating')
+    average_star = average_star.get_text().strip() if average_star != None else None
+    rating_count = product_html.select_one('span.rating-total-count')
+    rating_count = rating_count.get_text().lstrip('(').rstrip(')') if rating_count != None else None
     
     product_dict = {
+        'category_id' : category_id,
         'product_id' : product_id,
         'item_id' : item_id,
+        'vendor_item_id' : vendor_item_id,
         'product_name' : product_name,
+        'product_price' : product_price,
+        'average_star' : average_star,
         'rating_count' : rating_count,
     }
     
     return product_dict
 
 
-page = 1
-category_id = 486687
+def judge_value_of_review(review_dict):
+    rating_count = int(review_dict['rating_count']) if review_dict['rating_count'] != None else 0
+    if rating_count <= 500:
+        return False # bad product
+    else:
+        return True # good product
 
-cookies['CLICKED_PAGE'] = str(page)
-params['page'] = str(page)
-headers['referer'] = 'https://www.coupang.com/np/categories/{}'.format(category_id)
 
-response = requests.get('https://www.coupang.com/np/categories/{}'.format(category_id), params=params, cookies=cookies, headers=headers, timeout=3.)
+def judge_crawl_to_stop(num_bad_product):
+    if num_bad_product > 10:
+        return True # time to stop
+    else:
+        return False # keep crawling
 
-if response.status_code == 200:
-    product_list = []
-    
-    html = response.text
-    bsObject = BeautifulSoup(html, 'lxml')
-    
-    product_htmls = bsObject.select('li.baby-product')
-    for product_html in product_htmls:
-        product_list.append(extract_product_info(product_html))
+
+def get_products_info_in_single_page(category_id, page):
+    '''
+    page 하나에서 product info를 뽑아내는 함수
+    '''
+    cookies['CLICKED_PAGE'] = str(page)
+    params['page'] = str(page)
+    headers['referer'] = 'https://www.coupang.com/np/categories/{}'.format(category_id)
+
+    response = requests.get('https://www.coupang.com/np/categories/{}'.format(category_id), params=params, cookies=cookies, headers=headers, timeout=3.)
+
+    if response.status_code == 200:
+        product_list = []
+        
+        num_bad_product = 0
+        
+        html = response.text
+        bsObject = BeautifulSoup(html, 'lxml')
+        
+        product_htmls = bsObject.select('li.baby-product')
+        for product_html in product_htmls:
+            review_dict = extract_product_info(product_html, category_id)
+            if judge_value_of_review(review_dict) == False:
+                num_bad_product += 1
+            else:
+                product_list.append(review_dict)
+                
+        return product_list, num_bad_product
+    else:
+        print(response.status.code)
         
         
-print(product_list)
+def save_product_info(category_id, product_list):
+    try:
+        dir_loc = '{}/data/coupang/{}'.format(nowLoc, category_id)
+        try:
+            dirExist = os.path.exists(dir_loc)
+            if not dirExist :
+                os.makedirs(dir_loc)
+        except OSError:
+                print("Error: Creating Dir {}".format(dir_loc))
+                
+        try:
+            fileExist = os.path.exists("{}/{}.csv".format(dir_loc, category_id))
+            if not fileExist:
+                with open('{}/{}.csv'.format(dir_loc, category_id), 'a', newline='', encoding="utf-8-sig") as f_object:
+                    dictwriter_object = DictWriter(f_object, fieldnames=headersCSV)
+                    dictwriter_object.writeheader()
+        except OSError:
+                print("Error: Creating Csv {}/{}.csv".format(dir_loc, category_id))
+    
+        with open('{}/{}.csv'.format(dir_loc, category_id), 'a', newline='', encoding="utf-8-sig") as f_object:
+            dictwriter_object = DictWriter(f_object, fieldnames=headersCSV)
+            for i in product_list:
+                dictwriter_object.writerow(i)
+    except:
+        print("I think there is something wrong with saving...")
+        
+
+def get_save_products_info_in_single_category(category_id):
+    print("Start doing category: {}...".format(category_id))
+    num_product = 0
+    page = 0
+    
+    while 1:
+        page += 1
+        product_list, num_bad_product = get_products_info_in_single_page(category_id, page)
+        save_product_info(category_id, product_list)
+        num_product += len(product_list)
+        
+        if judge_crawl_to_stop(num_bad_product) == True:
+            print("So many bad product: # of {} in category:{}".format(num_bad_product, category_id))
+            break
+        if num_product >= max_product_info:
+            print("num of product in category:{} are bigger than {}".format(category_id, max_product_info))
+            break
+        
+        time.sleep(rantime(0.5, 0.7))
+        
+
+def get_save_products_info_in_given_categories(category_list):
+    for category_id in category_list:
+        get_save_products_info_in_single_category(category_id)
+        
+        
+#category_list = product_category_splited_section
+#get_save_products_info_in_given_categories(category_list)
+
+#link test
+# category_id = '225481'
+# page = 1
+# get_products_info_in_single_page(category_id, page)
