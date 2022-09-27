@@ -3,7 +3,9 @@ import os
 import pandas as pd
 from bs4 import BeautifulSoup
 from csv import DictWriter
+from category_id_info import product_category_splited_section
 import time
+import random
 
 nowLoc = os.getcwd()
 
@@ -71,14 +73,24 @@ params = {
     'page': '2',
 }
 
+
+def rantime(_min = 0., _max = 1.):
+    num = random.random()
+    return _min + num * (_max - _min)
+
+
 def extract_product_info(product_html, category_id):
     product_id = product_html['data-product-id']
     vendor_item_id = product_html['data-vendor-item-id']
     item_id = product_html.select_one('a.baby-product-link')['data-item-id']
-    product_name = product_html.select_one('div.name').get_text().strip()
-    product_price = product_html.select_one('strong.price-value').get_text().strip()
-    average_star = product_html.select_one('em.rating').get_text().strip()
-    rating_count = product_html.select_one('span.rating-total-count').get_text().lstrip('(').rstrip(')')
+    product_name = product_html.select_one('div.name')
+    product_name = product_name.get_text().strip() if product_name != None else None
+    product_price = product_html.select_one('strong.price-value')
+    product_price = product_price.get_text().strip() if product_price != None else None
+    average_star = product_html.select_one('em.rating')
+    average_star = average_star.get_text().strip() if average_star != None else None
+    rating_count = product_html.select_one('span.rating-total-count')
+    rating_count = rating_count.get_text().lstrip('(').rstrip(')') if rating_count != None else None
     
     product_dict = {
         'category_id' : category_id,
@@ -95,7 +107,8 @@ def extract_product_info(product_html, category_id):
 
 
 def judge_value_of_review(review_dict):
-    if int(review_dict['rating_count']) <= 500:
+    rating_count = int(review_dict['rating_count']) if review_dict['rating_count'] != None else 0
+    if rating_count <= 500:
         return False # bad product
     else:
         return True # good product
@@ -103,9 +116,9 @@ def judge_value_of_review(review_dict):
 
 def judge_crawl_to_stop(num_bad_product):
     if num_bad_product > 10:
-        return False # time to stop
+        return True # time to stop
     else:
-        return True # keep crawling
+        return False # keep crawling
 
 
 def get_products_info_in_single_page(category_id, page):
@@ -167,6 +180,7 @@ def save_product_info(category_id, product_list):
         
 
 def get_save_products_info_in_single_category(category_id):
+    print("Start doing category: {}...".format(category_id))
     num_product = 0
     page = 0
     
@@ -177,15 +191,19 @@ def get_save_products_info_in_single_category(category_id):
         num_product += len(product_list)
         
         if judge_crawl_to_stop(num_bad_product) == True:
+            print("So many bad product: # of {} in category:{}".format(num_bad_product, category_id))
             break
         if num_product >= max_product_info:
+            print("num of product in category:{} are bigger than {}".format(category_id, max_product_info))
             break
         
-        # time.sleep(1)
+        time.sleep(rantime(0.5, 0.7))
         
 
-# def get_save_products_info_in_given_categories(category_list):
-#     for category_id in category_list:
-#         get_save_products_info_in_single_category(category_id)
-category_id = 486687        
-get_save_products_info_in_single_category(category_id)
+def get_save_products_info_in_given_categories(category_list):
+    for category_id in category_list:
+        get_save_products_info_in_single_category(category_id)
+        
+        
+category_list = product_category_splited_section
+get_save_products_info_in_given_categories(category_list)
