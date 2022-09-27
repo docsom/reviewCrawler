@@ -7,6 +7,18 @@ import time
 
 nowLoc = os.getcwd()
 
+max_product_info = 100
+
+headersCSV = [
+    'product_id',
+    'item_id',
+    'vendor_item_id',
+    'product_name',
+    'product_price',
+    'average_star',
+    'rating_count',
+]
+
 cookies = {
     'PCID': '20118162313960784610299',
     'X-CP-PT-locale': 'ko_KR',
@@ -21,21 +33,19 @@ cookies = {
     'trac_addtag': '900',
     'trac_ctag': 'HOME',
     'searchSoterTooltip': 'OFF',
-    'searchKeyword': '%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80%20%EB%8D%94%ED%81%B0%20%ED%96%84%EA%B0%80%EB%93%9D%20%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8',
-    'searchKeywordType': '%7B%22%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80%20%EB%8D%94%ED%81%B0%20%ED%96%84%EA%B0%80%EB%93%9D%20%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8%22%3A0%7D',
-    'FUN': '"{\'search\':[{\'reqUrl\':\'/search.pang\',\'isValid\':true}]}"',
     'trac_spec': '10304902',
     'trac_lptag': 'coupang',
     'trac_itime': '20220926164908',
     'overrideAbTestGroup': '%5B%5D',
-    'bm_sz': '9C2FF18EC7201D94B4C8AA91A99154FD~YAAQ1pc7F+Ne63GDAQAAxL74eBHPtrl8xhG+SXkt32gMnizPcd2Xc7P7tnzcuO5WRznd9x9PkhtEwIq5uLc0Jw9NxQEP5zJi0Nt5125uGVgEsvUlTDZrMmdRf5qGteSRWPk8NYbAaQmYZB50pIKa3wissGBIe4FfXzVjsl7KcTm1us+aovqUfcUORk4qWHvxL5573OzQHVsHkcxB6vDA9YhLKTVb1lieEHrclHywz5hhZvygf4v6gHGkrD7QZIS+qA0AeZIAUdv6uvkYzrVf23OP1yB/ailztm2phhHeDl2J2X8zXDKVnQLtsfm3limRTKJ1504CszP3f/1C~4277040~4604227',
+    '_abck': 'B00E0DF2BD0B5CCE34434E7DA8E8E605~0~YAAQteQ1F/euVnSDAQAAeepOfAjfaDm5aXyApRh4iCc+vl/zzONp7T9JMV5z+bHg2WQrknQhj6TQdBXKt30RfoLzzmA/AoaXlji8LL3e01Y58ZHMaH4TTHqdtSR/kW+po8qShJG8LQn47dvCHYQtxFDRJS4vGHJ/gmaPIeER1fU5eDzx8p+Sbnx6POXi0Z6PRcfrU4VQR4Umg59gggVlYCLVxRetW6tAbu7Zzs0sSpDFU/kxy3AK3yu5KZVJ7UHl51nebZAX8iyOReIlLqTMW/MhPLp+FwQFHcq6AVEXo6xRV2mKB6NeSsJqlGzKqd1CvDiQp363eWgjAWrNUHwt5C46KX5OpiW7AePizKsWqNJ+De11F63BfvXQDK9ySoBdr4CKXA0IkBd/1td/hzb9pe0tCZ4ASw==~-1~-1~-1',
+    'bm_sz': 'A2539E0746184C37240F3B034FDB4326~YAAQteQ1F/quVnSDAQAAeepOfBGL0HzAz7lmz7uXdhQE7F2HKEVDeI1TcB3JLWEkUdP9hlENuj6Xh+1cJCNyovLx0TO8ce6oPbgd+0/BRcdZdajyjg8Oq84rpg1u3hgUVMHBWLGiahOzUNNu8ITxM/KUFyxlzSuktLowm/wgPmVCYCUn8OVOsHCJ43bFZ3iPnsUkhIRO8nA4f6++jcU52Tbs5UlSKowTvaHeJ5QIyno6eNsOxP2YO5E0sKXIb8J/dcAn7t6w3o2nUIJmQFaJrscgxzTz4cerkDYWG1gy0/x/zkz+~3290421~3551300',
+    'bm_mi': 'AD8321FD4B7A4E6FE5E4A3B906F7887E~YAAQteQ1FxyxVnSDAQAAEfBOfBEX4X3hNhEJvZlwAj61lrPs6oc7OiqkSTYCpJwDg8xoGVMu881LSGEZVZVQJ5Z5hs8iKgjzf182JsYwLQE7ZAKi4Sp6MqsY6GJaghcF6aWinKiPuV4QB5ghbRLzIRLCbel9U7r2t0vUbzwjsSIzy+sUY/0bhHu8wx/yTnbEVv+AUCob0xIxZ63Nkb/eccqIib0ncM7PBuJ5GC7GC8d2gqJPZkt1nogP7UFbAuF/9WbmXhucmDA+lqRtH3S+phWbFcEA0Qeq1D53rxpIVGCbPhocoy8m94NcJauZG9s=~1',
+    'ak_bmsc': 'A7FAC9BE4194233EEC02491E502BE242~000000000000000000000000000000~YAAQteQ1F/a1VnSDAQAAr/1OfBEAiXLNOeA+xDuv41R9Y67hiU0NyTSKmwq0L7elpMIBkhXzTHfqFJ48rnxRFwxITpcDdkcjX5tf1Da/icU+1p2yVT5njIOn6ao+Bi7Jckxb4BlfQkPyuMT8bFA3IKg9/HjUxu4jy3DLxqF++vpFpAJtGkiIovOAoGc4lxHs4tq383t5c9dku6y69zjyufIBwOSjglXPp+3K7bI0F4zY0ARcm6CrEeZPoYgEts0iPjKlMP5zQpk0PlR3EVFS3xRQdZFuyvzWvNTTJLTK0IxB5zA/1BpCP9PBcGkSPLsApl/beVjTge/eW3snJAzuPbjKvhfFWmlSDZV9zglNuWsZF/XfN9f87y5UZmTw7BxVAQ2i/vPu99ivAnzCweXuoEoj9kB8Z4xsah3NKzkvm+vsXcJpFcFBFoVfSK4hoMyKRx/WNXNfXYoNRmB4Jcix5iGJo1+1BDU21ACZAGd6F0GV+XxXu11+x5Dn2TUWY0U1IFbE',
+    'cto_bundle': 'OdzM218wSTBCNmtVdmVUT0RCc3Vlc09YVlcxQTVqRlVjVDJEZTdsMGtTJTJGYnJFek1tT0Z2V2QlMkJ6Wm05TnRUcm4xMW5JN3dramRhM2kwJTJCQVRvdjdKMXFESEFJSlFjbTNBWEt2MGxRNSUyQklNZUhKb3FHNVpWUEVkckZPM0J1RDEwSWxLcWRwNCUyQll0cndpcG5zenJWbEpqdlRQbmF3JTNEJTNE',
+    'x-coupang-accept-language': 'ko_KR',
+    'bm_sv': '0C08F20D03A3F8598ADFDF58D27D76C2~YAAQteQ1F3pBV3SDAQAA491QfBEWrByZi4TGVNZy5z1wKR7MBewC+TYR4stKSKgXK811nf1Dncy+EgGHPK2neLVm2mwSMbU+/7l1IuNxQyhBPvVsvuvE8+3Pi/n+12t/xallfhUt0QAFTqCasxKZgv1rOXIcio/HuBIQtGr1WxAYi8s5wNXLZjYNEoGKNOHLo0ASgYv3xd1da2ruwK8AUSrtKRd5glOBOvjz0kG0HzCp11GVycNDw0e/Sn8tNhlWLpg=~1',
     'baby-isWide': 'small',
-    'bm_sv': '252B6591B7F3B2775E0B8D08BE30332D~YAAQ1pc7F29f63GDAQAAocH4eBHIzjXcMUaZs/LGtjPAmWbJK9WnRFvi8xeQTtNRS9BIzbSN05xedrNlirG2GKp/VKuYIiNWSmM5SWPq+S7VBowt+Ny/WhEDghCDHBPH+hOjhXwHlHKFlZW/MSreP+qG6GIURpFDGfwIsXe1iMx6XrDwAf98YZ7o3VQZ8UqyPDybcb8Xvky8GLVq90ASZY2IeUCZfCEO0jwipnp/ylTrryinceM6/iUwS3cqtfFcAQ==~1',
-    'cto_bundle': 'xNyobF8wSTBCNmtVdmVUT0RCc3Vlc09YVld4NHhjQ0tQNEFjUjAzS2NoZ0Q2SmVqQ0F4Qnc2ME45TCUyQkVCTndhTnVoNlZFbjZmVElndWxsZzdDZmlpbFcxbkt2YU41UnMlMkJLQTFvZ1c3QVo0TmJ5NldBejRBMkh0byUyRiUyRiUyQmFvTWt2eiUyQjV4aE5FRnZNVUNrSFdPeU9uQURHYU4lMkJUZyUzRCUzRA',
-    '_abck': 'B00E0DF2BD0B5CCE34434E7DA8E8E605~0~YAAQ1pc7F31f63GDAQAAycH4eAhmN0chRARSRwahhjEaorHNyCQwDz6xB+NDAwBieevt6hik8iojSjXtBh1g0NiRWS4MMwk4L256qBPKmDWwTpieeIBW/JlgN82Brkt9A/bbKHdpGl3ilAh9X4HOPdIBm5/iATs9CuONAUFWI2xD/vZ5tfjN9sHIcFqWPd7CjL5uI/f0zC1AteftDqUVj9UtyhYxOwiLISJkad08wSRo0o94VZAgnjgqu3Tper/zxIzjPBeBVlRwaqskDbsIjXGlcp9eJGcqzER3MbvtPriZUQ/d4EHNqAuCG0xf5ggWn/Ss9WN3UwTB4qdPm24Gbr4RSxzhBCBcVpz1jvDUKDTP0BqE2RhPoxQ4QLI=~-1~-1~-1',
-    'x-coupang-accept-language': 'ko-KR',
-    'ak_bmsc': 'F2CB48D31C310FC26FD24AEFA8BF581E~000000000000000000000000000000~YAAQ1pc7F5Vf63GDAQAALML4eBErwwo+WOX+Evn83hi9PYW7RHBc+ym0wO+bw2S2X6v4JTC0q2PvHSa355oIdKzitpg7qAbyO1nJiqvQ64ki2APibcHDoM5I+bDtS7+EnyvzrBYh+ZQIi44MEYdKBtZyepjVYqt5P6B++40mxYSzQ6wzKsj25TdZTcZkb+s2zFeWXTp7ZnvNeDXOXW1fkdagip0DCEoPTXwL3rDRW/Dp7ClmcUbvweI+OrBF3m7IIof6kJvlMUQmWcWQVba+tnGIxl/9QAnG0RrS//9lXq+/1BlA1jHwqLibZqH/6CEC+5N+MwsQ9iRiFd+QzybaNKYIQ09xJBQey1O9iDCcKiXEfPNJ1/6dZ86imsNHVoGa2uhAuIcqrvk5RFWkR+g8lg1TXlCvQtivIKNcyBCdqu2YrG2X6YlPUZG6n6jFcOTJVZSYTl7+kHZdFnA5yry0kG7VpBGaFKgeG+64Uf2J25txvE6o1UH3f/kqshWr',
-    'CLICKED_PAGE': '2',
+    'CLICKED_PRODUCT_ID': '1866720935',
 }
 
 headers = {
@@ -62,38 +72,71 @@ params = {
 
 def extract_product_info(product_html):
     product_id = product_html['data-product-id']
+    vendor_item_id = product_html['data-vendor-item-id']
     item_id = product_html.select_one('a.baby-product-link')['data-item-id']
     product_name = product_html.select_one('div.name').get_text().strip()
+    product_price = product_html.select_one('strong.price-value').get_text().strip()
+    average_star = product_html.select_one('em.rating').get_text().strip()
     rating_count = product_html.select_one('span.rating-total-count').get_text().lstrip('(').rstrip(')')
     
     product_dict = {
         'product_id' : product_id,
         'item_id' : item_id,
+        'vendor_item_id' : vendor_item_id,
         'product_name' : product_name,
+        'product_price' : product_price,
+        'average_star' : average_star,
         'rating_count' : rating_count,
     }
     
     return product_dict
 
 
+def judge_value_of_review(review_dict):
+    if int(review_dict['rating_count']) <= 500:
+        return False # bad product
+    else:
+        return True # good product
+
+
+def judge_crawl_to_stop(num_bad_product):
+    if num_bad_product > 10:
+        return False # time to stop
+    else:
+        return True # keep crawling
+
+
+def get_save_products_info_in_single_page(category_id, page):
+    '''
+    page 하나에서 product info를 뽑아내는 함수
+    '''
+    cookies['CLICKED_PAGE'] = str(page)
+    params['page'] = str(page)
+    headers['referer'] = 'https://www.coupang.com/np/categories/{}'.format(category_id)
+
+    response = requests.get('https://www.coupang.com/np/categories/{}'.format(category_id), params=params, cookies=cookies, headers=headers, timeout=3.)
+
+    if response.status_code == 200:
+        product_list = []
+        
+        num_bad_product = 0
+        
+        html = response.text
+        bsObject = BeautifulSoup(html, 'lxml')
+        
+        product_htmls = bsObject.select('li.baby-product')
+        for product_html in product_htmls:
+            review_dict = extract_product_info(product_html)
+            if judge_value_of_review(review_dict) == False:
+                num_bad_product += 1
+            else:
+                product_list.append(review_dict)
+                
+        return review_dict, num_bad_product
+    else:
+        print(response.status.code)
+        
 page = 1
 category_id = 486687
 
-cookies['CLICKED_PAGE'] = str(page)
-params['page'] = str(page)
-headers['referer'] = 'https://www.coupang.com/np/categories/{}'.format(category_id)
-
-response = requests.get('https://www.coupang.com/np/categories/{}'.format(category_id), params=params, cookies=cookies, headers=headers, timeout=3.)
-
-if response.status_code == 200:
-    product_list = []
-    
-    html = response.text
-    bsObject = BeautifulSoup(html, 'lxml')
-    
-    product_htmls = bsObject.select('li.baby-product')
-    for product_html in product_htmls:
-        product_list.append(extract_product_info(product_html))
-        
-        
-print(product_list)
+get_save_products_info_in_single_page(category_id, page)
