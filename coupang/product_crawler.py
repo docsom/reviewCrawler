@@ -205,5 +205,5 @@ def get_save_products_info_in_given_categories(category_list):
         get_save_products_info_in_single_category(category_id)
         
         
-category_list = product_category_splited_section
-get_save_products_info_in_given_categories(category_list)
+#category_list = product_category_splited_section
+#get_save_products_info_in_given_categories(category_list)

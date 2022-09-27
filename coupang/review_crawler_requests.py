@@ -294,9 +294,9 @@ def get_save_reviews_in_given_products(category_id, target_products):
         except:
             record_log_of_single_product_status(category_id, product_id, "Error")
     
-category_id = '225481'
-target_products = get_target_products_info_in_single_category(category_id)
+# category_id = '225481'
+# target_products = get_target_products_info_in_single_category(category_id)
 
-target_products = [a for a in target_products if (a[0] != 206820279 and a[0] != 4567751809)]
+# target_products = [a for a in target_products if (a[0] != 206820279 and a[0] != 4567751809)]
 
-get_save_reviews_in_given_products(category_id, target_products)
+# get_save_reviews_in_given_products(category_id, target_products)
