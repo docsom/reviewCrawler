@@ -7,13 +7,26 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from csv import DictWriter
 import time
+import random
+from datetime import datetime
 
+
+def rantime(_min = 0., _max = 1.):
+    num = random.random()
+    return _min + num * (_max - _min)
 class NoSuchFileError(Exception):
     pass
 
 nowLoc = os.getcwd()
-min_text_len = 1
-max_num_of_review_per_star = 2
+min_text_len = 15
+max_num_of_review_per_star = 400
+
+log_headersCSV = [
+    'time',
+    'category_id',
+    'product_id',
+    'status',
+]
 
 headersCSV = [
     'review_id',
@@ -37,28 +50,21 @@ cookies = {
     'x-coupang-origin-region': 'KOREA',
     'x-coupang-target-market': 'KR',
     '_ga': 'GA1.2.644421614.1663552878',
-    'ILOGIN': 'Y',
     'gd1': 'Y',
-    'rememberme': 'true',
     'trac_src': '1042016',
-    'trac_spec': '10304903',
     'trac_addtag': '900',
     'trac_ctag': 'HOME',
-    'trac_lptag': '%EC%BF%A0%ED%8C%A1',
-    'trac_itime': '20220926095636',
-    'searchSoterTooltip': 'OFF',
-    'bm_sz': '7749705569E9172FA9005DE0EC0DE358~YAAQbQI1FymRvHCDAQAAaQQleBHPg1RSd45YJATaJes5KGQafo8noUH5hGBYn40iv+BL9gVM6tKVLkNZRDC29rCkzZ6bqDKMIh1ZhRPo1B5VfjvSkr5PpihPDS/kqfrcX128IyGNEWsYSm/nQwappHSZ0NT4M8t/IqVMGnz0qnnh+6o4rAdnPAct30a3ckW9gZS917pWLVFgUdXMx+5EkIgl4vTUkq34OCIXySnWvnPJ36P5f/UjUE3idGVrWkKnjkynCkobZa/UacLQaX1OWcpQ6pI1hlsuvLE7ZAajuLYndk8r9+x0aXNYsrvkvH7tpSXZq/4J+E+qe15F~3163442~4276545',
-    'overrideAbTestGroup': '%5B%5D',
-    'bm_mi': '95634CFF5907175AE08CB9E42082E124~YAAQt5c7Fx4gck+DAQAAdgNteBGbBSCH1h1q/xFvMS1gBtsG4Odw8T7pNy1lHuBVZnXZdQStCyTS+bGkCXqcIR+pzbv1Q9j7fpZE8cLUQT6bqTCH0M51ZNPaxaf45WFRs2tetjWDlJRT0qSI1fvnmkUajj5FhzNSGqqRMC06Z2ban2HHh2+7exkyw3lKN5BTOCFNEwiNp3lZ810VPbrjihgHBwAEpF3+GjynOLVIg2BstF9D1hX/oJJOGVLViHwsy5Uv7jDkoQEciwiqS77lYTim2GI1IX7qUnq5XoZJOy/TBmBxeAPHOitRd22/3B7efP7nKjQSd51tRCpUnuTY2FbaaisgiRVktHTyDvVtRQCqhTuR~1',
-    'ak_bmsc': '27642A0BAA81998174E481E14B9F41E1~000000000000000000000000000000~YAAQt5c7F0Ynck+DAQAAsCNteBEVGBhn+LoeKzqJ+CSlc4l4Vcy4FTS22wkFuUsITFCHoG51YGFuxtvwvMIYT44Vjdp9A54whRw1jK6P2AxNz2Xa2tjGLEr7rZOdu4lKbWQycoVE+uAKiNjVnG05KW9QogizeFUg+v9WjeWUjlPzwyaWBEQCYNbaZUpJtXA6VjfFteWkKf7i7yPjeUyUiMfbmbFm5OMGH2O+sH9SVIM064KD0z2CCHIdKMs535pIG1TVNg5gk3sA8k2hLe06etwEpXZ4EMXUeyImGnZgv+19f0iJOd3Xe5SrzQ+iQgz207K7j6RJbSVSaHb2RWPVdAeV7zgFalsKLSJqUt+2Z+qDPkUguYQSdUUd1rjgJIjxLyYTZyFrv4SzyzBpSTNb1ovLBgrYS91GYYVkU5jgEX5Nn+/R3BpS6IV7qUA39NdlMXjDIu+oOlIfJzVJ/oT/wmaLzBikR1MXtU0KpG8zIAH9V6E3jRWGY0QWAiXQK4s5jcYqCu84oIILq+xTZOpGs4axQQnzJ0rb1zVHQXgMFbXp/KQcxqATag==',
     'searchKeyword': '%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80%20%EB%8D%94%ED%81%B0%20%ED%96%84%EA%B0%80%EB%93%9D%20%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8',
     'searchKeywordType': '%7B%22%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80%20%EB%8D%94%ED%81%B0%20%ED%96%84%EA%B0%80%EB%93%9D%20%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8%22%3A0%7D',
-    'FUN': '"{\'search\':[{\'reqUrl\':\'/search.pang\',\'isValid\':true}]}"',
+    'trac_spec': '10304902',
+    'trac_lptag': 'coupang',
+    'trac_itime': '20220926164908',
+    'CLKEY': '"bFRMdkpueldjNDVnN0JLL2xiMUZBVzJmTmd6aGVnREhXRTVJUGFKT043SWlHVHFVb0ljZ2ZLWTBZMjJSTE9aUVFvUEorbGNieWowWnhBTT0="',
+    'CP_JOIN_KEY': '"R1hkdEEwRk5JRStJcFpCWEdSRFR3QS9FMU1TOGpIeWw3cXppb2krSHZjRG5mTU05VDVPQVV3YXVhYlExNnUvUVhiYkpkRnJ3b0ZVOGpnUT0="',
+    '_abck': 'B00E0DF2BD0B5CCE34434E7DA8E8E605~0~YAAQruQ1FxmT5ViDAQAAeV5ofAhTRlC2S0B0S5kcsFp4REcej1dh61OnKmsAS/MN3yXKFv5IaXmtXqiiQFvlJd87bJNIfLtuSUNJ+VmOFxZkLP0a6h1SVqA13/K/oH2tRBRBQSo8Ur/SMsF72FWDfnLDbafHtVbeLLF2OwlRwGhNtkbwfs891UTa3DGoHVL8uqzbXnld/W/iGeSDjyCT0BRSQ3YNzl7Mlp6SNJqXlHtXcgXTM6gvpKmu2CAZMEFvTD52tWp1YS+/TUsxXg/zTJyju8NcXO9G0sYwzPWzWVrAl5tz2K6as3yzjfeyPBwXIFfw0Ff0IJj6CMj34tRQpRtL4qGCSbbHcwM/znvimClITknaxhbEh9CC2Xv4DQyNTQGVBFW0qf4O47xRbiY0Tl+8XX1Zog==~-1~-1~-1',
     'x-coupang-accept-language': 'ko_KR',
+    'cto_bundle': 'vs02mF8wSTBCNmtVdmVUT0RCc3Vlc09YVld3OWRsSFU3ZlBaJTJGQ1R1UGtCTHlmWmhvSFZHTFlNemVSM1paZVM4WUdKNWtCY2toYUxudkM1WUNsN2xDYXFFd2c4c3VXOUI2V0NHUExQNjZPQlBUb1liRnhLeCUyRks5QVlsdUhNeUs4N1FLYUcxS0pkU1hzSmpVUkZjdjVjcHNNeUlnJTNEJTNE',
     'baby-isWide': 'small',
-    'cto_bundle': 'KKVoOV8wSTBCNmtVdmVUT0RCc3Vlc09YVlcxbDVVWDZPRDB5aFFraDVYbGYwZEFYTVAxS1Vac0YlMkZGMCUyRmc2eUJPN0VvZVJjdncydm1UbDFkWGlRNmp1dWVzR01xeGZGMzNBQk5HZ1NudWxsY3VLQlFQU091ZjJlVUc1ZHFCYVBqNXRsZHJocE9MMSUyQkdWRENGbVB5NWdvYXZpa3clM0QlM0Q',
-    '_abck': 'B00E0DF2BD0B5CCE34434E7DA8E8E605~0~YAAQtwI1F726NHCDAQAAiEV+eAhJzB9Zn3YmDnNhcD7rAtlSng0OQkYib0YkSfKtivF96PBcIsxRDhoYEpd0M/1WAv18/EFLU9dQlQaSRNUaESa3G6+EQwYqsWldQ9pZsFcHeQsjFD9s8LsvxcVfpj9TkNvf6dDo1ic5eyzeV22/WYP7uinWW3N8/vTlSL15PiifKuaOvOEtAaM36Sj9dU7yLpA83cfETbg9Xy538fOCx27PtMMFd+EuHxz9hxxOMP4OnnogJtRywiH3Kduz/pNB5T4iWQtubmVTEWEvoMgmnpwmE/6bSJsqqfq1PNRmxdQ0RfNVSYocKoG+RkC5q/udOP1xsC5m8hOOeWZkVGASAPjmVkUbIYFfLLM=~-1~-1~-1',
-    'bm_sv': '4853930EBB3EC2598A320D85528673F9~YAAQtwI1F766NHCDAQAAiEV+eBH7WUXpfWx3oLch/LsVkodOjBf2IMaM7PnTn7p8xQgOZjIwHTyOmHh9BBotXTqUZjG8/8wnvTcZjPvT12QDeqfA2xI4ZcDRGC62KzRDVaRdljub6gsbj37GDCgGq84GA7RdDc/ZA5W456+HkAqELKoYiKNKID9r0+XbIYpgk7YVi4DGXiyU1GCyqwuLDx6tbtMA35zmMjMfV2RUZ579QGn7ljo1BP+XX4LAaGWU8CM=~1',
 }
 
 headers = {
@@ -213,12 +219,40 @@ def get_save_reviews_in_single_product(category_id, product_id, item_id):
             review_list, should_stop = get_reviews_in_single_page(product_id, item_id, page, str(ratings))
             save_reviews(category_id, product_id, review_list)
             num_of_review_per_star += len(review_list)
+            print("Category: {}, Product: {}, Ratings: {}, Review: {}".format(category_id, product_id, ratings, num_of_review_per_star))
+            
+            time.sleep(rantime(0.2, 0.4))
+            
             if should_stop == True:
                 break
             if num_of_review_per_star >= max_num_of_review_per_star:
                 break
-    print("all reviews in product:{} is taken".format(product_id))
+    print("all reviews in category:{}, product:{} is taken".format(category_id, product_id))
+
+
+def record_log_of_single_product_status(category_id, product_id, status):
+    log_loc = '{}/data/coupang/log.csv'.format(nowLoc)
+    log_exist = os.path.exists(log_loc)
     
+    now = datetime.now()
+    with open(log_loc, 'a', newline='', encoding="utf-8-sig") as f_object:
+        log_single_product = {
+            'time': now,
+            'category_id': category_id,
+            'product_id': product_id,
+            'status': status,
+        }
+        dictwriter_object = DictWriter(f_object, fieldnames=log_headersCSV)
+        if not log_exist:
+            dictwriter_object.writeheader()
+            dictwriter_object.writerow(log_single_product)
+        else:
+            dictwriter_object.writerow(log_single_product)
+    
+    print('log recorded: time:{}, category:{}, product_id:{}, status:{}'.format(now, category_id, product_id, status))
+            
+    
+        
     
 def get_target_products_info_in_single_category(category_id):
     '''
@@ -244,9 +278,19 @@ def get_target_products_info_in_single_category(category_id):
     
 def get_save_reviews_in_given_products(category_id, target_products):
     for product_id, item_id in target_products:
-        get_save_reviews_in_single_product(category_id, product_id, item_id)
+        try:
+            get_save_reviews_in_single_product(category_id, product_id, item_id)
+            record_log_of_single_product_status(category_id, product_id, "Done")
+        except TimeoutError:
+            print("TimeOutError Occurred")
+            record_log_of_single_product_status(category_id, product_id, "TimeOutError")
+            break
+        except:
+            record_log_of_single_product_status(category_id, product_id, "Error")
     
-    
-category_id = '502382'
-target_products = get_target_products_info_in_single_category(225481)
+category_id = '225481'
+target_products = get_target_products_info_in_single_category(category_id)
+
+target_products = [a for a in target_products if (a[0] != 206820279 and a[0] != 4567751809)]
+
 get_save_reviews_in_given_products(category_id, target_products)
