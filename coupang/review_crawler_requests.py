@@ -8,9 +8,12 @@ from bs4 import BeautifulSoup
 from csv import DictWriter
 import time
 
+class NoSuchFileError(Exception):
+    pass
+
 nowLoc = os.getcwd()
 min_text_len = 1
-max_num_of_review_per_star = 15
+max_num_of_review_per_star = 2
 
 headersCSV = [
     'review_id',
@@ -217,7 +220,33 @@ def get_save_reviews_in_single_product(category_id, product_id, item_id):
     print("all reviews in product:{} is taken".format(product_id))
     
     
+def get_target_products_info_in_single_category(category_id):
+    '''
+    product_crawler을 통해 만든 product_info csv 파일에서
+    product_id, item_id를 뽑아오는 함수
+    return: list[tuple(product_id, item_id), tuple()...]
+    '''
+    data_loc = '{}/data/coupang/{}/{}.csv'.format(nowLoc, category_id, category_id)
+    data_exist = os.path.exists(data_loc)
+    
+    if not data_exist:
+        print("You should make category info of id:{}".format(category_id))
+        raise NoSuchFileError
+
+    data_csv = pd.read_csv(data_loc)
+    target_products = []
+    
+    for _, row in data_csv.iterrows():
+        target_products.append((row.product_id, row.item_id))
+    
+    return target_products
+    
+    
+def get_save_reviews_in_given_products(category_id, target_products):
+    for product_id, item_id in target_products:
+        get_save_reviews_in_single_product(category_id, product_id, item_id)
+    
+    
 category_id = '502382'
-product_id = '1717552921'
-item_id = '2923167957'
-get_save_reviews_in_single_product(category_id, product_id, item_id)
+target_products = get_target_products_info_in_single_category(225481)
+get_save_reviews_in_given_products(category_id, target_products)
