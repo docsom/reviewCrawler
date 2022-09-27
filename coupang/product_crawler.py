@@ -10,6 +10,7 @@ nowLoc = os.getcwd()
 max_product_info = 100
 
 headersCSV = [
+    'category_id',
     'product_id',
     'item_id',
     'vendor_item_id',
@@ -70,7 +71,7 @@ params = {
     'page': '2',
 }
 
-def extract_product_info(product_html):
+def extract_product_info(product_html, category_id):
     product_id = product_html['data-product-id']
     vendor_item_id = product_html['data-vendor-item-id']
     item_id = product_html.select_one('a.baby-product-link')['data-item-id']
@@ -80,6 +81,7 @@ def extract_product_info(product_html):
     rating_count = product_html.select_one('span.rating-total-count').get_text().lstrip('(').rstrip(')')
     
     product_dict = {
+        'category_id' : category_id,
         'product_id' : product_id,
         'item_id' : item_id,
         'vendor_item_id' : vendor_item_id,
@@ -106,7 +108,7 @@ def judge_crawl_to_stop(num_bad_product):
         return True # keep crawling
 
 
-def get_save_products_info_in_single_page(category_id, page):
+def get_products_info_in_single_page(category_id, page):
     '''
     page 하나에서 product info를 뽑아내는 함수
     '''
@@ -126,17 +128,64 @@ def get_save_products_info_in_single_page(category_id, page):
         
         product_htmls = bsObject.select('li.baby-product')
         for product_html in product_htmls:
-            review_dict = extract_product_info(product_html)
+            review_dict = extract_product_info(product_html, category_id)
             if judge_value_of_review(review_dict) == False:
                 num_bad_product += 1
             else:
                 product_list.append(review_dict)
                 
-        return review_dict, num_bad_product
+        return product_list, num_bad_product
     else:
         print(response.status.code)
         
-page = 1
-category_id = 486687
+        
+def save_product_info(category_id, product_list):
+    try:
+        dir_loc = '{}/data/coupang/{}'.format(nowLoc, category_id)
+        try:
+            dirExist = os.path.exists(dir_loc)
+            if not dirExist :
+                os.makedirs(dir_loc)
+        except OSError:
+                print("Error: Creating Dir {}".format(dir_loc))
+                
+        try:
+            fileExist = os.path.exists("{}/{}.csv".format(dir_loc, category_id))
+            if not fileExist:
+                with open('{}/{}.csv'.format(dir_loc, category_id), 'a', newline='', encoding="utf-8-sig") as f_object:
+                    dictwriter_object = DictWriter(f_object, fieldnames=headersCSV)
+                    dictwriter_object.writeheader()
+        except OSError:
+                print("Error: Creating Csv {}/{}.csv".format(dir_loc, category_id))
+    
+        with open('{}/{}.csv'.format(dir_loc, category_id), 'a', newline='', encoding="utf-8-sig") as f_object:
+            dictwriter_object = DictWriter(f_object, fieldnames=headersCSV)
+            for i in product_list:
+                dictwriter_object.writerow(i)
+    except:
+        print("I think there is something wrong with saving...")
+        
 
-get_save_products_info_in_single_page(category_id, page)
+def get_save_products_info_in_single_category(category_id):
+    num_product = 0
+    page = 0
+    
+    while 1:
+        page += 1
+        product_list, num_bad_product = get_products_info_in_single_page(category_id, page)
+        save_product_info(category_id, product_list)
+        num_product += len(product_list)
+        
+        if judge_crawl_to_stop(num_bad_product) == True:
+            break
+        if num_product >= max_product_info:
+            break
+        
+        # time.sleep(1)
+        
+
+# def get_save_products_info_in_given_categories(category_list):
+#     for category_id in category_list:
+#         get_save_products_info_in_single_category(category_id)
+category_id = 486687        
+get_save_products_info_in_single_category(category_id)
