@@ -2,8 +2,8 @@ from review_crawler_requests import *
 from category_id_info import *
 from product_crawler import *
 
-#category_list = product_category_splited_section
-#get_save_products_info_in_given_categories(category_list)
+category_list = product_category_splited_section
+get_save_products_info_in_given_categories(category_list)
 
 category_id = 225481
 target_products = get_target_products_info_in_single_category(category_id)
