@@ -1,15 +1,17 @@
 import requests
-from bs4 import BeautifulSoup
-import json
-from csv import DictWriter
 import os
+
+nowLoc = os.getcwd()
+category_id = 100002454
+url = 'https://search.shopping.naver.com/search/category/{}?origQuery&pagingSize=80&productSet=total&query&sort=review&timestamp=&viewType=list'.format(
+    category_id)
 
 headers = {
     'authority': 'search.shopping.naver.com',
     'accept': 'application/json, text/plain, */*',
     'accept-language': 'ko',
     'logic': 'PART',
-    #'referer': 'https://search.shopping.naver.com/search/category/100002454?catId=50001081&origQuery&pagingIndex=1&pagingSize=60&productSet=total&query&sort=review&timestamp=&viewType=list',
+    'referer': url,
     'sec-ch-ua': '"Microsoft Edge";v="105", " Not;A Brand";v="99", "Chromium";v="105"',
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
@@ -34,22 +36,34 @@ params = {
     'xq': '',
 }
 
-nowLoc = os.getcwd()
-category_id = 100002454
-filename = str(category_id)+'_products.txt'
-page = 1
-url = 'https://search.shopping.naver.com/search/category/{}?origQuery&pagingIndex={}&pagingSize=80&productSet=total&query&sort=review&timestamp=&viewType=list'.format(category_id, page)
+response = requests.get('https://search.shopping.naver.com/api/search/category/{}'.format(
+    category_id), params=params, headers=headers)
+json_object = response.json()
+products = json_object['shoppingResult']['products']
+totalPages = json_object['productSetFilter']['filterValues'][0]['productCount']//80
 
-html = requests.get(url).text
-soup = BeautifulSoup(html, 'html.parser')
-data = soup.find_all('em', 'basicList_num__sfz3h')
+f_object = open('{}/data/naver/ids_{}.txt'.format(nowLoc,
+                category_id), 'a', encoding='utf-8-sig')
 
+endSearch = False
 
-
-response = requests.get('https://search.shopping.naver.com/api/search/category/100002454', params=params, headers=headers)
-
-f_object = open('{}/data/naver/{}'.format(nowLoc, filename), 'a', encoding='utf-8-sig')
-
-
+for page in range(totalPages):
+    print(page)
+    for product in products:
+        if product['reviewCountSum'] > 5000:
+            if product['mallProductUrl'][:18] == 'https://smartstore':
+                f_object.write(product['mallProductUrl']+'\n')
+        else:
+            endSearch = True
+            break
+    if endSearch:
+        break
+    params['pagingIndex'] = str(int(params['pagingIndex'])+1)
+    if int(params['pagingIndex']) > totalPages:
+        break
+    response = requests.get('https://search.shopping.naver.com/api/search/category/{}'.format(
+        category_id), params=params, headers=headers)
+    json_object = response.json()
+    products = json_object['shoppingResult']['products']
 
 f_object.close()
