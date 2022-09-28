@@ -50,25 +50,17 @@ cookies = {
     'x-coupang-target-market': 'KR',
     '_ga': 'GA1.2.644421614.1663552878',
     'gd1': 'Y',
-    'trac_src': '1042016',
-    'trac_addtag': '900',
-    'trac_ctag': 'HOME',
     'searchKeyword': '%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80%20%EB%8D%94%ED%81%B0%20%ED%96%84%EA%B0%80%EB%93%9D%20%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8',
     'searchKeywordType': '%7B%22%ED%94%84%EB%A0%88%EC%8B%9C%EC%A7%80%20%EB%8D%94%ED%81%B0%20%ED%96%84%EA%B0%80%EB%93%9D%20%EB%B6%80%EB%8C%80%EC%A0%84%EA%B3%A8%22%3A0%7D',
-    '_abck': 'B00E0DF2BD0B5CCE34434E7DA8E8E605~0~YAAQvwI1F2ANDXODAQAA/YZzfQjd2M+jIPrK9pjQDvRxp4+hr8ZxOoMxqjiCJ3LkiQVb5Nd9srLZfSUlCsEDhssFIWFfoIxzQQ6YKo1UgCSdxFwGEk61FzdzjwONHDhWXjWn3XqHDonB98/p7908ewaiRaORSseHoR2gDweQCvlR16H07EaQ9IJk/DjWSi/eSFQFo7nNlQ7NJS5sNjgasTS+67OEOAUa2tWO7rY1tED9KO/+K3pJ66MeFqla5fGbXhieEQma6rj24pXJiMcvNWem07OdwMknUOeJ6vczFuBLKl+DMS618TXfGveGlDPSBa1dAtMPkae6zVR5ao0SFoZIZcfQEQgM4Bp+77DD5ET8ue9dqcFOK9cd5xQJPHuwi2aTdpa8Bw/7WZnZEarGKQYIMwYZ5w==~-1~-1~-1',
-    'bm_sz': '76E6FDD83B03B4AE3D4243934E29189B~YAAQvwI1F2MNDXODAQAA/YZzfRHWmRguDdLOxe+ROouNvxZEH1/zltpJshM9Cobkrn/ZqkF2DvA7HylcuXQCCDL8wSmuuXFoIrtTJEBdXOccleF/r37tIhS47x1p0QTaQnw4vB5nst5+vu6TJ3vHvQKdTVY2hUfOen5TslvIfsuKqM633Ea+wHI0pma6dxjzEKvrRsTphSsVmJzdozdXlaZNpYzsV1glXbFAaLxCJnHCXRTQud4hbwLfvqnM3iHfsuPg1xcKvWHzL4w0TRfI5z7yXi81vEMqIWL85mqtB7JLI3S3~3425335~3687218',
-    'trac_spec': '10304903',
-    'trac_lptag': '%EC%BF%A0%ED%8C%A1',
-    'searchSoterTooltip': 'OFF',
-    'bm_mi': '2EB8D7FDA951D548CA8F2A3DF980CAB4~YAAQdHpGaAUYA1iDAQAAE03ifRE7t2vYh/zCmJspZE/GXymu8A78EmmlsBm20WzUhdt4IpONzg36M9ihcF0e0VaZno+0H+C61QW1XAOXvg2w45WU7zTDtcCKXrkLP/ZF8iouDX+9c2eQlYNklcU0315v0YDeB+BAqzGRyJvVyYOq+nmGgagCdEx5QhSRbTTc52WUiKH+J28hbTBiI7V7RnShNPABzkUnf7j9SpqJvaCyioWXUtkyVwvsfKgE0iLLakza2C4B9OrUWCg8myxRpAN52Rqi4TQkTWii0XWxTkhvPMB9900ryoHxNfTDc5jhbkCKe6CEn2JvUx2kKQEWLK2tEKJLmP3qZnDDN1QxtsIasHPX~1',
-    'ak_bmsc': '39F08B5E0AB559174408003ABADC533D~000000000000000000000000000000~YAAQdHpGaFEYA1iDAQAALU7ifRF8XEQR2Bpd8O1q4fcWPVLcuAK+zhoOOaIXTUiqEs7FxRJL2kIxg7rt1gdGphtfdmbNrEN9I8Q92npII/Zh52lWDT4FPUM/dJ5iZipQDJze1c0G3lxTfH79BNo5CkFJf2Ty78ZmEfm+bnxK9LZVcDS+UpAwhgysZ7ACLQwg/yQHVEwndlGU1GaIpC1gd+neNB+R9BBYkpZg+CDc7+dHkS6FsTsJWLg6gWPVH/4OrCJzdpdENUKistE2s9BpaaLUOq9kvYVlTXsM92ScU4tJqxeRQHpZeVkvuo5rAtzbuiGe7kcLwDo2deaFGBFBVdimUgnQpqUpR4AniRY7VbXkciZva2PQ6cxOqsoYXQ+9RLmEiSrv1iL7KV3A75dTZ6RiekhcRevT9hqIWTxpMmRABPA/8EeJTPWULaAPUaadDrSEfHfuUEN67QeNxY4wAEL2NmDYsGAZyv1cFeDkei45vWf/5iaBmavP0X6VP9Vd71b/R2QONNWnyTSktvjKAcpjpLGARq4xZW+mIYQBURo3IzSOB5zfrA==',
     'overrideAbTestGroup': '%5B%5D',
-    'trac_itime': '20220927171544',
-    'CLICKED_PRODUCT_ID': '1465379083',
-    'x-coupang-accept-language': 'ko_KR',
+    '_abck': 'B00E0DF2BD0B5CCE34434E7DA8E8E605~0~YAAQfyPJF4xPQYCDAQAAu1Q2gwh8Cucwqg/LQm2MocWIDUElhbL1ltvQBqzmZ5c3EQcaZfIN7Qm+gbx738myLq+lU//++pvuAMHi5D4iYr90lE3BRLU/Alocv5hLSi+RsKfUTDoQ5LFzwbyUl/HkOXtE7b6ccE289xD8gNNlr8U1pmqxKBN27hHxh/Z1WUeO4r63Jq02ghRngm3QHQkjemC+xPo3zFtVkXGJ6OG4e4kF3oVVFlsRHXHGAeAqPuPiXwI6xPV3c1FhgxczAWxUdzwGfhQXspRRpH6KnqkmturSc+APT04kH+ccHT92MytpixmYXP/Ybdjx+h81OsIiz2WrFA9LIL5Q8eRTZOPaUu8oepROON/Nlf09EZvN/XAlsfZIunDeQHOrTYB1gtWDc3G8tv3PhQ==~-1~-1~-1',
+    'bm_sz': 'C201AA439FE25B7BB25BA0EA4ACDF608~YAAQfyPJF49PQYCDAQAAu1Q2gxH33pPQ62/KAodKQknAKCfdUqd27hJA2j3QcTseJXLYy9egt+aue1+ichz4XEY/6B+ZIH+3+tKIdVeomI9J52mXmKH70erlEp63FXzVh1DKvLBZhYqWNB5slnZf2iormBzajQydEcpXBuskJmHYnZnmdHkNZUs5mNgATSwP4LjUnJ5gED2D1ABDwyZyhsmnFzRDr1AANzuwLlaV++saxgT+46mJNGp5WYLnQ05TVLnKDHQxYKcPNaNbQPa6Dp//j2cx5HcyVBEjeF22n/IAhcPz~4601409~3425080',
+    'ak_bmsc': 'E7856699CD9E6373694232BF59F98BD8~000000000000000000000000000000~YAAQfyPJF6FQQYCDAQAAjlg2gxEZ72wB0nT4i2R9Fg6KM2gEzU6wL8rA2EDfO8IfKyaKh5TraStQrp1o22VIe/Zj2pijCgMQSnPa5z70zIuWv85PpEOWBOnU36qptFbZORV4ncVwebX4RoUb64g9S+xATYnRVTXpu3tVTGLAAhkVyiT58xPsWYFOCxRfW8BeDWxp62F/69kO+nW0RNMS/vMvMZMfFhNxPmdGtgiDCTHEiKXx53C/zVg/FLJ0toJDbIJKCUBRCvnMrZaSlVGYp8/pSwO5vd6SDu/wYMZ/gQoDgMwc1+rXpmoofAcBBK5ywepgeDL6qm212bdQ3qzZRmjtMrTHHTNlFxLnYmEsUXwaiqK/sDU6fjA4J8sPdNPp7RDHqQvVLDD+CXIqHIme1hTJ4YFFJGakCnwOxUCH86uPwqls1jlIsr3BNryrVf9J0uP3qV67qgoSevjAhN5p6Dc8DwHlu/wk9V8zI8ayJjXX++g6DZeS+Cle',
     'baby-isWide': 'small',
-    'cto_bundle': 'Wp5dm18wSTBCNmtVdmVUT0RCc3Vlc09YVlc5SXRpS2lYN3I2MXQxQzhVZjdTMkh1SlNmNFhHZDg4R1RMZ1hLUUhSODZwVzRxMTI1NzhOenR2aExIaU5nZE5qSTElMkJtR3Mya3dCM2l0cURIZVNsanVPaFFxJTJCU1dVa0R0Z25SQzNWY1VxU01oSmFnWVpHa090dndIRmRsOHlmSHZBJTNEJTNE',
-    'bm_sv': 'A6C492481096B28EDDED97705DACA238~YAAQRgI1F4qagnKDAQAAz10EfhFqgiN8koUKU/wHJFUue47VF9RdwunPc/+FxacDzlUrmq8TEp/gvqBEwEooGinqKjMDHsGcPpBVnl0o68YAVfvso1YXh6fLIZ41QDqcukpQb+wVQJF/FIcceAgUTUNrp1oTEjBOUu07Ho0rWGGfX/3rugptsuRjfrr1/fzN7WvREItZO0eFnm73JHyTIVWDGcURzeRpUzlriGY2ppBr0hc0e5zDVgThGeIsbfEvz/c=~1',
+    'x-coupang-accept-language': 'ko-KR',
+    'cto_bundle': '4W5X4V8wSTBCNmtVdmVUT0RCc3Vlc09YVlc5dHo0SjhDUEFCbW9iOXpONUR3OFp5bE5QZzI4OUIlMkJOcGxwQURsWVZ4b1AlMkJDemNGWFhDZmExd2VtN21YQ1FmTmZEekNNZmh1UU9ncTl2ak13blBGekhra2RpRktKeElGUkZxakpPcmEwRUt3NTg5Um01MTNTbFlWU3hOZUxSZXd3JTNEJTNE',
+    'bm_sv': '807AF9B440DEED13CE8B1BC297825ED5~YAAQfyPJF2pgQYCDAQAAUZk2gxEyj3Z0Xic8gA/P42IkQ9YlXUYewznDN9Xyi5Vpab1bH8CxdiVKJLk2FDJVgZnH5H/waOao6jsLqwFgdDao9QPZAzTbmp5zSXEOm1n5sJlfzgJL4t2epERBnbCxocs1ljNMQrLbG0JbSNRvSsSq3BJWW2MK7+8H0N9a0kmQG8zhErObcZG5gyzqnofU4RvVgMfVrvGaFnXJnjI9mZGFYjJkl66hKR7vWXUAc5hGoQ==~1',
+    'CLICKED_PRODUCT_ID': '6667212605',
 }
 
 headers = {
@@ -260,7 +252,7 @@ def record_log_of_single_product_status(category_id, product_id, status):
     
         
     
-def get_target_products_info_in_single_category(category_id):
+def get_target_products_in_single_category(category_id):
     '''
     product_crawler을 통해 만든 product_info csv 파일에서
     product_id, item_id를 뽑아오는 함수
@@ -298,10 +290,34 @@ def get_save_reviews_in_given_products(category_id, target_products):
         #     record_log_of_single_product_status(category_id, product_id, "TimeOutError")
         #     break
 
+def get_target_products_not_done_in_single_category(category_id):
+    log_loc = '{}/data/coupang/log.csv'.format(nowLoc)
+    if os.path.isfile(log_loc) != True:
+        print("No Log!!!")
+        return None
+    log_csv = pd.read_csv(log_loc)
+    done_list = log_csv.loc[log_csv.status == 'Done']
+    done_list = done_list.loc[done_list.category_id == int(category_id)]
+    done_list = [int(id) for id in done_list.product_id]
     
-# category_id = '225481'
-# target_products = get_target_products_info_in_single_category(category_id)
-
-# target_products = [a for a in target_products if (a[0] != 206820279 and a[0] != 4567751809)]
-
-# get_save_reviews_in_given_products(category_id, target_products)
+    data_loc = '{}/data/coupang/{}/{}.csv'.format(nowLoc, category_id, category_id)
+    data_exist = os.path.exists(data_loc)
+    if not data_exist:
+        print("You should make category info of id:{}".format(category_id))
+        raise NoSuchFileError
+    data_csv = pd.read_csv(data_loc)
+    target_products = []
+    for _, row in data_csv.iterrows():
+        target_products.append((row.product_id, row.item_id))
+        
+    return_list = []
+    for set in target_products:
+        if int(set[0]) not in done_list:
+            return_list.append(set)
+            
+    return return_list
+    
+ 
+#category_id = '225481'
+#target_products = get_target_products_not_done_in_single_category(category_id)
+#get_save_reviews_in_given_products(category_id, target_products)
