@@ -205,8 +205,22 @@ def get_save_products_info_in_single_category(category_id):
 def get_save_products_info_in_given_categories(category_list):
     for category_id in category_list:
         get_save_products_info_in_single_category(category_id)
+        overwrite_drop_duplicates_in_existing_single_category(category_id)
         
-        
+
+def overwrite_drop_duplicates_in_existing_single_category(category_id):
+    '''
+    중복을 삭제해주는 함수
+    이미 지금 있는 거에는 처리 다 했음
+    '''
+    product_info_loc = '{}/data/coupang/{}/{}.csv'.format(nowLoc, category_id, category_id)
+    try:
+        products_info = pd.read_csv(product_info_loc)
+        products_info.drop_duplicates('product_id', inplace = True)
+        products_info.reset_index(drop=True, inplace = True)
+        products_info.to_csv('./data/coupang/{}/{}.csv'.format(category_id, category_id), index=False, encoding='utf-8-sig')
+    except:
+        print("Error!")
 #category_list = product_category_splited_section
 #get_save_products_info_in_given_categories(category_list)
 
