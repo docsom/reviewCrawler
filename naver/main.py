@@ -1,5 +1,5 @@
-from review_crawler_smartstore import *
-from product_crawler import *
+from review_crawler_smartstore import reviewCrawler
+from product_crawler import productCrawler
 from category_id_info import *
 import multiprocessing
 from functools import partial
@@ -13,13 +13,16 @@ with open("data/naver/ids_100002454.txt", "r", encoding='utf-8-sig') as f:
     URLs = f.read().splitlines()
     products = [url[43:] for url in URLs]
 
-if __name__ == '__main__':
-    start_time = time.time()
-    pool = multiprocessing.Pool(processes=8)
-    func = partial(reviewCrawler, sortTypeNum=3)
-    pool.map(func, URLs, products)
-    pool.close()
-    pool.join()
-    print("--- elapsed time %s seconds ---" % (time.time() - start_time))
+print(URLs)
+print(products)
+
+# if __name__ == '__main__':
+#     start_time = time.time()
+#     pool = multiprocessing.Pool(processes=8)
+#     func = partial(reviewCrawler, category_id= 100002454, sortTypeNum=3)
+#     pool.map(func, URLs, products)
+#     pool.close()
+#     pool.join()
+#     print("--- elapsed time %s seconds ---" % (time.time() - start_time))
 
 # 데이터 폴더에 카테고리 있는지 확인하고 폴더 만들기
