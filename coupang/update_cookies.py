@@ -1,19 +1,7 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By 
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 
-
-from bs4 import BeautifulSoup
 import os
 import subprocess
-import time
-import random
-import shutil
-from csv import DictWriter
-import pandas as pd
 import json
 
 def update_cookie():
