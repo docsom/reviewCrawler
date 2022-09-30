@@ -25,7 +25,7 @@ def get_review_topics(review_text, topics):
     return text
 
 
-def reviewCrawler(target_url, category_id, filename, sortTypeNum):
+def reviewCrawler(target_url, filename, category_id, sortTypeNum):
     html = requests.get(target_url).text
     soup = BeautifulSoup(html, 'html.parser')
     dict = soup.select_one('body > script:nth-child(2)').get_text()
@@ -109,4 +109,4 @@ if __name__ == '__main__':
     target_url = 'https://smartstore.naver.com/main/products/139208874'
     filename = 'test3'
     category_id = 100002454
-    reviewCrawler(target_url, category_id, filename, 3)
+    reviewCrawler(target_url, filename, category_id, 3)
