@@ -10,6 +10,7 @@ import time
 import random
 from datetime import datetime
 import json
+from requests.exceptions import ReadTimeout
 
 def rantime(_min = 0., _max = 1.):
     num = random.random()
@@ -19,7 +20,7 @@ class NoSuchFileError(Exception):
 
 nowLoc = os.getcwd()
 min_text_len = 15
-max_num_of_review_per_star = 400
+max_num_of_review_per_star = 600
 
 log_headersCSV = [
     'time',
@@ -224,7 +225,7 @@ def get_save_reviews_in_single_product(category_id, product_id, item_id):
             num_of_review_per_star += len(review_list)
             print("Category: {}, Product: {}, Ratings: {}, Review: {}".format(category_id, product_id, ratings, num_of_review_per_star))
             
-            time.sleep(rantime(0.2, 0.4))
+            time.sleep(rantime(0.08, 0.13))
             
             if should_stop == True:
                 break
@@ -288,12 +289,20 @@ def get_save_reviews_in_given_products(category_id, target_products):
             print("KeyboardInterrupt Occurred")
             record_log_of_single_product_status(category_id, product_id, "KeyboardInterrupt")
             break
+        except ReadTimeout:
+            print("TimeOutError Occurred")
+            
+            from update_cookies import update_cookie
+            update_cookie()
+            try:
+                get_save_reviews_in_single_product(category_id, product_id, item_id)
+                record_log_of_single_product_status(category_id, product_id, "Done")
+            except ReadTimeout:
+                print("cookies could not update")
+                record_log_of_single_product_status(category_id, product_id, "TimeOutError")
+            break
         except:
             record_log_of_single_product_status(category_id, product_id, "Error")
-        # except ReadTimeout:
-        #     print("TimeOutError Occurred")
-        #     record_log_of_single_product_status(category_id, product_id, "TimeOutError")
-        #     break
 
 def get_target_products_not_done_in_single_category(category_id):
     log_loc = '{}/data/coupang/log.csv'.format(nowLoc)
@@ -323,6 +332,6 @@ def get_target_products_not_done_in_single_category(category_id):
     return return_list
     
  
-category_id = '225481'
+category_id = '225491'
 target_products = get_target_products_not_done_in_single_category(category_id)
 get_save_reviews_in_given_products(category_id, target_products)

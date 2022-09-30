@@ -108,4 +108,4 @@ def extract_info_in_all_category():
     }
     return info_dict
 
-#print(extract_info_in_all_category())
+print(extract_info_in_all_category())
