@@ -11,6 +11,8 @@ import random
 from datetime import datetime
 import json
 from requests.exceptions import ReadTimeout
+import sys
+from update_cookies import update_cookie
 
 def rantime(_min = 0., _max = 1.):
     num = random.random()
@@ -291,15 +293,21 @@ def get_save_reviews_in_given_products(category_id, target_products):
             break
         except ReadTimeout:
             print("TimeOutError Occurred")
-            
-            from update_cookies import update_cookie
             update_cookie()
+            with open(cookies_loc, 'r') as f:
+                cookies = json.load(f)
+            print("Cookie Update Complete")
             try:
                 get_save_reviews_in_single_product(category_id, product_id, item_id)
                 record_log_of_single_product_status(category_id, product_id, "Done")
             except ReadTimeout:
                 print("cookies could not update")
                 record_log_of_single_product_status(category_id, product_id, "TimeOutError")
+                sys.exit(1)
+            except:
+                print("something's wrong!!!")
+                record_log_of_single_product_status(category_id, product_id, "Error")
+                sys.exit(1)
             break
         except:
             record_log_of_single_product_status(category_id, product_id, "Error")
@@ -332,6 +340,6 @@ def get_target_products_not_done_in_single_category(category_id):
     return return_list
     
  
-category_id = '225491'
+category_id = '225504'
 target_products = get_target_products_not_done_in_single_category(category_id)
 get_save_reviews_in_given_products(category_id, target_products)
