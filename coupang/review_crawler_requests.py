@@ -12,7 +12,7 @@ from datetime import datetime
 import json
 from requests.exceptions import ReadTimeout
 import sys
-from update_cookies import update_cookie
+from update_cookies import *
 
 def rantime(_min = 0., _max = 1.):
     num = random.random()
@@ -45,8 +45,7 @@ headersCSV = [
 ]
 
 cookies_loc = '{}/coupang/cookies.json'.format(nowLoc)
-with open(cookies_loc, 'r') as f:
-    cookies = json.load(f)
+cookies = get_cookie()
 
 headers = {
     'authority': 'www.coupang.com',
@@ -271,8 +270,8 @@ def get_save_reviews_in_given_products(category_id, target_products):
         except ReadTimeout:
             print("TimeOutError Occurred")
             update_cookie()
-            with open(cookies_loc, 'r') as f:
-                cookies = json.load(f)
+            global cookies
+            cookies = get_cookie()
             print("Cookie Update Complete")
             try:
                 get_save_reviews_in_single_product(category_id, product_id, item_id)
@@ -315,8 +314,18 @@ def get_target_products_not_done_in_single_category(category_id):
             return_list.append(set)
             
     return return_list
+
+def get_all_category_ids_with_folder():
+    categories_loc = '{}/data/coupang'.format(nowLoc)
+    categories = os.listdir(categories_loc)
+    categories.remove('log.csv')
+    return categories
     
  
-category_id = '225504'
-target_products = get_target_products_not_done_in_single_category(category_id)
-get_save_reviews_in_given_products(category_id, target_products)
+category_ids = get_all_category_ids_with_folder()
+category_ids.remove('225481')
+category_ids.remove('225491')
+category_ids.remove('225504')
+for category_id in category_ids:
+    target_products = get_target_products_not_done_in_single_category(category_id)
+    get_save_reviews_in_given_products(category_id, target_products)
