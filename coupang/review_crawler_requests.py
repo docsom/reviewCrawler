@@ -12,7 +12,7 @@ from datetime import datetime
 import json
 from requests.exceptions import ReadTimeout
 import sys
-from update_cookies import update_cookie
+from update_cookies import *
 
 def rantime(_min = 0., _max = 1.):
     num = random.random()
@@ -45,8 +45,7 @@ headersCSV = [
 ]
 
 cookies_loc = '{}/coupang/cookies.json'.format(nowLoc)
-with open(cookies_loc, 'r') as f:
-    cookies = json.load(f)
+cookies = get_cookie()
 
 headers = {
     'authority': 'www.coupang.com',
@@ -128,6 +127,9 @@ def judge_value_of_review(_text):
     
     
 def get_reviews_in_single_page(product_id, item_id, page, ratings):
+    '''
+    리퀘스트를 직접 받아오는 함수, 불러온 리뷰들을 dictionary list의 형태로, 그리고 더 크롤링 해야하는 지에 대한 판단도 이 함수의 책임
+    '''
     referer = 'https://www.coupang.com/vp/products/{}?itemId={}&isAddedCart='.format(product_id, item_id)
     params['productId'] = product_id
     params['page'] = page
@@ -164,6 +166,7 @@ def get_reviews_in_single_page(product_id, item_id, page, ratings):
 def save_reviews(_category_id, _product_id, _review_list):
     '''
     리스트로 들어온 리뷰 info를 저장하는 함수
+    리뷰 저장에 관한 기능들을 책임짐
     '''
     try:
         dir_loc = '{}/data/coupang/{}/reviews'.format(nowLoc, _category_id)
@@ -194,6 +197,9 @@ def save_reviews(_category_id, _product_id, _review_list):
 
 
 def get_save_reviews_in_single_product(category_id, product_id, item_id):
+    '''
+    하나의 product에 대해 리뷰를 긁어오고 저장하는 모든 과정을 이 함수에서 책임짐
+    '''
     for ratings in range(1, 6):
         page = 0
         num_of_review_per_star = 0
@@ -214,6 +220,10 @@ def get_save_reviews_in_single_product(category_id, product_id, item_id):
 
 
 def record_log_of_single_product_status(category_id, product_id, status):
+    '''
+    status에 따라 category의 product에 해당하는 로그를 log.csv에 남기는 함수
+    로그를 남기는 모든 과정을 이 함수에서 책임짐
+    '''
     log_loc = '{}/data/coupang/log.csv'.format(nowLoc)
     log_exist = os.path.exists(log_loc)
     
@@ -260,6 +270,10 @@ def get_target_products_in_single_category(category_id):
     
     
 def get_save_reviews_in_given_products(category_id, target_products):
+    '''
+    category_id, target_products list에 기반해서 리뷰를 request로 불러오고, 저장하는 함수
+    카테고리는 그냥 데이터 저장할때 목록을 불러오는 용도로 사용되고, target_products에 기반해서 request가 돌아가니까 유의할 것
+    '''
     for product_id, item_id in target_products:
         try:
             get_save_reviews_in_single_product(category_id, product_id, item_id)
@@ -271,8 +285,8 @@ def get_save_reviews_in_given_products(category_id, target_products):
         except ReadTimeout:
             print("TimeOutError Occurred")
             update_cookie()
-            with open(cookies_loc, 'r') as f:
-                cookies = json.load(f)
+            global cookies
+            cookies = get_cookie()
             print("Cookie Update Complete")
             try:
                 get_save_reviews_in_single_product(category_id, product_id, item_id)
@@ -290,6 +304,10 @@ def get_save_reviews_in_given_products(category_id, target_products):
             record_log_of_single_product_status(category_id, product_id, "Error")
 
 def get_target_products_not_done_in_single_category(category_id):
+    '''
+    하나의 카테고리에 대해서만 불러오니까 유의할 것
+    로그를 분석해서 done이 아닌 products id만 리스트로 불러오는 함수
+    '''
     log_loc = '{}/data/coupang/log.csv'.format(nowLoc)
     if os.path.isfile(log_loc) != True:
         print("No Log!!!")
@@ -315,8 +333,22 @@ def get_target_products_not_done_in_single_category(category_id):
             return_list.append(set)
             
     return return_list
+
+def get_all_category_ids_with_folder():
+    '''
+    data/coupang 안에 있는 카테고리 리스트를 불러오는 함수
+    '''
+    categories_loc = '{}/data/coupang'.format(nowLoc)
+    categories = os.listdir(categories_loc)
+    categories.remove('log.csv')
+    return categories
     
  
-category_id = '225504'
-target_products = get_target_products_not_done_in_single_category(category_id)
-get_save_reviews_in_given_products(category_id, target_products)
+category_ids = get_all_category_ids_with_folder()
+category_ids.remove('225481')
+category_ids.remove('225491')
+category_ids.remove('225504')
+# 각각의 카테고리에 대해서 책임질 수 있어
+for category_id in category_ids:
+    target_products = get_target_products_not_done_in_single_category(category_id)
+    get_save_reviews_in_given_products(category_id, target_products)

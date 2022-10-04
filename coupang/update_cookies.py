@@ -4,6 +4,8 @@ import os
 import subprocess
 import json
 
+nowLoc = os.getcwd()
+
 def update_cookie():
     subprocess.Popen(r'C:\Program Files\Google\Chrome\Application\chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\chrometemp"')
     options = webdriver.ChromeOptions()
@@ -28,3 +30,9 @@ def update_cookie():
         json.dump(cookies_dict, f, indent=4)
 
     driver.close()
+    
+def get_cookie():
+    cookies_loc = '{}/coupang/cookies.json'.format(nowLoc)
+    with open(cookies_loc, 'r') as f:
+        cookies = json.load(f)
+        return cookies
