@@ -22,6 +22,7 @@ def init_review_manager(_category_id, _manager_loc):
         for product_id in product_ids:
             
             data = pd.read_csv('{}/data/kurly/{}/reviews/{}.csv'.format(os.getcwd(), _category_id, product_id))
+            #data.drop_duplicates('review_num', inplace = True)
             data = [int(id) for id in data.review_num if str(id).isdigit()]
             if len(data) != 0:
                 _max = max(data)
@@ -84,3 +85,24 @@ class ReviewManager:
             
     def get_max_min_of_product_id(self, _product_id):
         return self.df.loc[_product_id, "max"], self.df.loc[_product_id, "min"]
+    
+    
+def get_all_category_ids_with_folder():
+    '''
+    data/kurly 안에 있는 카테고리 리스트를 불러오는 함수
+    '''
+    nowLoc = os.getcwd()
+    categories_loc = '{}/data/kurly'.format(nowLoc)
+    categories = os.listdir(categories_loc)
+    return categories
+
+categories = get_all_category_ids_with_folder()
+
+
+for category in categories:
+    try:
+        print(category, "...")
+        a = ReviewManager(category)
+        a.info()
+    except:
+        continue
