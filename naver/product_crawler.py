@@ -70,6 +70,6 @@ def productCrawler(category_id, catId, minReviewNum):
     print('The URL of products have been crawled.')
 
 if __name__ == "__main__":
-    category_id = 100002454
-    catId = 50001081
+    category_id = 100002684
+    catId = 50012960
     productCrawler(category_id, catId, 5000)
