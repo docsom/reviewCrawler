@@ -9,6 +9,8 @@ nowLoc = os.getcwd()
 def update_cookie():
     subprocess.Popen(r'C:\Program Files\Google\Chrome\Application\chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\chrometemp"')
     options = webdriver.ChromeOptions()
+    options.add_argument("headless")
+    options.add_argument('--blink-settings=imagesEnabled=false')
     options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
 
     driver=webdriver.Chrome('./chromedriver.exe', options=options)
@@ -28,8 +30,9 @@ def update_cookie():
 
     with open(cookies_loc, 'w') as f : 
         json.dump(cookies_dict, f, indent=4)
-
+        
     driver.close()
+    driver.quit()
     
 def get_cookie():
     cookies_loc = '{}/coupang/cookies.json'.format(nowLoc)
