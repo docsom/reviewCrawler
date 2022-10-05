@@ -5,7 +5,7 @@
 # 마켓컬리 데이터 집어넣고 컨플에 정리해
 import os
 import pandas as pd
-
+#hi
 now_loc = os.getcwd()
 coup_loc = '{}/data/coupang'.format(now_loc)
     
@@ -108,4 +108,8 @@ def extract_info_in_all_category():
     }
     return info_dict
 
-print(extract_info_in_all_category())
+print(extract_info_in_all_category()['got_num_of_products'])
+
+print(extract_info_in_all_category()['total_review_num'])
+
+print(extract_info_in_all_category()['num_by_rating'])
