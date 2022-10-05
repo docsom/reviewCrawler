@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import json
 from csv import DictWriter
-import os
 
 headersCSV = [
     "review_id",
@@ -31,7 +30,12 @@ def reviewCrawler(target_url, category_id, sortTypeNum):
     soup = BeautifulSoup(html, 'html.parser')
     dict = soup.select_one('body > script:nth-child(2)').get_text()
     dict = dict[27:]
-    json_object = json.loads(dict)
+    if not dict.find('async') == -1: # 비동기식 스크립트 에러 발생. 나중에 고치기
+        return
+    try:
+        json_object = json.loads(dict)
+    except:
+        return
     if response.url[:13] == 'https://brand': # 브랜드 스토어
         merchant_num = json_object['channel']['A']['payReferenceKey']
     else: # 스마트 스토어
@@ -110,6 +114,6 @@ def reviewCrawler(target_url, category_id, sortTypeNum):
 
 
 if __name__ == '__main__':
-    target_url = 'https://smartstore.naver.com/main/products/139208874'
-    category_id = 100002454
+    target_url = 'https://smartstore.naver.com/main/products/730406364'
+    category_id = 100002455
     reviewCrawler(target_url, category_id, 3)
