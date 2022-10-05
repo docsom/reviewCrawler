@@ -287,7 +287,9 @@ def get_save_reviews_in_given_products(category_id, target_products):
             update_cookie()
             global cookies
             cookies = get_cookie()
-            print("Cookie Update Complete")
+            print("Cookie Update Complete... Please wait 100 seconds...")
+            time.sleep(100)
+            print("After 100 Seconds...")
             try:
                 get_save_reviews_in_single_product(category_id, product_id, item_id)
                 record_log_of_single_product_status(category_id, product_id, "Done")
