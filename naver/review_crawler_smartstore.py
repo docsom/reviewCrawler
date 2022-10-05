@@ -25,13 +25,17 @@ def get_review_topics(review_text, topics):
     return text
 
 
-def reviewCrawler(target_url, filename, category_id, sortTypeNum):
-    html = requests.get(target_url).text
+def reviewCrawler(target_url, category_id, sortTypeNum):
+    response = requests.get(target_url)
+    html = response.text
     soup = BeautifulSoup(html, 'html.parser')
     dict = soup.select_one('body > script:nth-child(2)').get_text()
     dict = dict[27:]
     json_object = json.loads(dict)
-    merchant_num = json_object['smartStoreV2']['channel']['payReferenceKey']
+    if response.url[:13] == 'https://brand': # 브랜드 스토어
+        merchant_num = json_object['channel']['A']['payReferenceKey']
+    else: # 스마트 스토어
+        merchant_num = json_object['smartStoreV2']['channel']['payReferenceKey']
     product_num = json_object['product']['A']['productNo']
     sortType = [
         'REVIEW_RANKING',           # 랭킹순
@@ -72,14 +76,14 @@ def reviewCrawler(target_url, filename, category_id, sortTypeNum):
     # 크롤링할 마지막 페이지, 스마트스토어 리뷰는 천 페이지까지만 조회가능
     lastPage = totalPages if totalPages < 1001 else 1000
 
-    f_object = open('data/naver/{}/{}.csv'.format(category_id, filename), 'w',
+    f_object = open('data/naver/{}/{}.csv'.format(category_id, target_url[43:]), 'w',
                     encoding='utf-8-sig', newline='')
     dictwriter_object = DictWriter(f_object, fieldnames=headersCSV)
     dictwriter_object.writeheader()
 
     for page in range(lastPage):
         if page % 100 == 0:
-            print("제품번호 {}, 페이지 {}번째 크롤링 중".format(filename, page))
+            print("제품번호 {}, 페이지 {}번째 크롤링 중".format(target_url[43:], page))
         for i in range(len(data['contents'])):
             review = data['contents'][i]
             dict = {
@@ -107,6 +111,5 @@ def reviewCrawler(target_url, filename, category_id, sortTypeNum):
 
 if __name__ == '__main__':
     target_url = 'https://smartstore.naver.com/main/products/139208874'
-    filename = 'test3'
     category_id = 100002454
-    reviewCrawler(target_url, filename, category_id, 3)
+    reviewCrawler(target_url, category_id, 3)
