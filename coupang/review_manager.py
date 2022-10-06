@@ -5,7 +5,9 @@
 # 마켓컬리 데이터 집어넣고 컨플에 정리해
 import os
 import pandas as pd
-#hi
+import json
+from datetime import datetime
+
 now_loc = os.getcwd()
 coup_loc = '{}/data/coupang'.format(now_loc)
     
@@ -43,6 +45,7 @@ def extract_info_in_reviews_csv(category_id, product_id):
 def extract_info_in_single_category(category_id):
     std_products_loc = '{}/{}/{}.csv'.format(coup_loc, category_id, category_id)
     if os.path.isfile(std_products_loc) == False:
+        print(std_products_loc)
         print('No Product_List of Single Category: {}'.format(category_id))
         raise FileNotFoundError
     
@@ -84,6 +87,7 @@ def extract_info_in_single_category(category_id):
 def extract_info_in_all_category():
     categories = os.listdir(coup_loc)
     categories.remove('log.csv')
+    categories.remove('info.json')
     ratings_num = [0, 0, 0, 0, 0, 0]
     target_num_of_products = 0
     got_num_of_products = 0
@@ -100,6 +104,7 @@ def extract_info_in_all_category():
         each_category_info.append(category_info)
     
     info_dict = {
+        'collected_time' : datetime.now().strftime("%Y.%m.%d %H:%M:%S"),
         'target_num_of_products': target_num_of_products,
         'got_num_of_products': got_num_of_products,
         'total_review_num' : total_review_num,
@@ -108,8 +113,12 @@ def extract_info_in_all_category():
     }
     return info_dict
 
-print(extract_info_in_all_category()['got_num_of_products'])
+def save_info_to_file():
+    info_dict = extract_info_in_all_category()
+    save_loc = '{}/info.json'.format(coup_loc)
+    with open(save_loc, 'w') as f : 
+        json.dump(info_dict, f, indent=4)
+    
 
-print(extract_info_in_all_category()['total_review_num'])
 
-print(extract_info_in_all_category()['num_by_rating'])
+save_info_to_file()

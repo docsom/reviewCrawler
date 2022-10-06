@@ -343,6 +343,7 @@ def get_all_category_ids_with_folder():
     categories_loc = '{}/data/coupang'.format(nowLoc)
     categories = os.listdir(categories_loc)
     categories.remove('log.csv')
+    categories.remove('info.json')
     return categories
     
  
