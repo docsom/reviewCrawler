@@ -1,4 +1,3 @@
-from genericpath import isfile
 from review_crawler_smartstore import reviewCrawler
 from product_crawler import productCrawler
 from category_id_info import *
@@ -6,6 +5,7 @@ import multiprocessing
 from functools import partial
 import time
 import os
+import pandas as pd
 
 
 def getProductsList(company, category_id, catId, minReviewNum):
@@ -20,25 +20,49 @@ def getProductsList(company, category_id, catId, minReviewNum):
         return f.read().splitlines()
 
 
+def missingUrlCheck(UrlList):
+    URL = []
+    for url in UrlList:
+        txt = "data/{}/{}/{}.csv".format(company, category_id, url[43:])
+        if os.path.isfile(txt):
+            continue
+        else:
+            URL.append(url)
+    return URL
+
+
+def countReviewsProducts():
+    reviewNum, productNum = 0, 0
+    path = 'C:\\Users\\CJ\\project\\review_crawler\\data\\naver'
+    dir = []
+    (root, directories, files) = next(os.walk(path))
+    for d in directories:
+        d_path = os.path.join(root, d)
+        dir.append(d_path)
+    for filePath in dir:
+        csvAll = os.listdir(filePath)
+        csvAll = [filePath + '\\' + csv for csv in csvAll]
+        for csv in csvAll:
+            df = pd.read_csv(csv)
+            reviewNum += len(df)
+        productNum += len(csvAll)
+    return (reviewNum, productNum)
+
+
 company = 'naver'
-category_id = mealKit[1][0][0]
-catId = mealKit[1][0][1]
+category_id = drink[1][2][0]
+catId = drink[1][2][1]
 minReviewNum = 5000
 sortTypeNum = 3
 
 URLs = getProductsList(company, category_id, catId, minReviewNum)
-
 # print(URLs)
-# for url in URLs:
-#     txt = "data/{}/{}/{}.csv".format(company, category_id, url[43:])
-#     if os.path.isfile(txt):
-#         continue
-#     else:
-#         print(url)
+# print(missingUrlCheck(URLs))
+# print(countReviewsProducts())
 
+start_time = time.time()
 if __name__ == '__main__':
     multiprocessing.freeze_support()
-    start_time = time.time()
     pool = multiprocessing.Pool(processes=16)
     func = partial(reviewCrawler, category_id=category_id,
                    sortTypeNum=sortTypeNum)
