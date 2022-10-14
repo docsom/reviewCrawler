@@ -28,13 +28,16 @@ def reviewCrawler(target_url, category_id, sortTypeNum):
     response = requests.get(target_url)
     html = response.text
     soup = BeautifulSoup(html, 'html.parser')
-    dict = soup.select_one('body > script:nth-child(2)').get_text()
+    try:
+        dict = soup.select_one('body > script:nth-child(2)').get_text()
+    except: # 비동기식 스크립트 에러 발생. 나중에 고치기
+        return
     dict = dict[27:]
     if not dict.find('async') == -1: # 비동기식 스크립트 에러 발생. 나중에 고치기
         return
     try:
         json_object = json.loads(dict)
-    except:
+    except: # 비동기식 스크립트 에러 발생. 나중에 고치기
         return
     if response.url[:13] == 'https://brand': # 브랜드 스토어
         merchant_num = json_object['channel']['A']['payReferenceKey']
@@ -114,6 +117,6 @@ def reviewCrawler(target_url, category_id, sortTypeNum):
 
 
 if __name__ == '__main__':
-    target_url = 'https://smartstore.naver.com/main/products/730406364'
-    category_id = 100002455
+    target_url = 'https://smartstore.naver.com/main/products/574268591'
+    category_id = 100007947
     reviewCrawler(target_url, category_id, 3)
