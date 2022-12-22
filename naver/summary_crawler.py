@@ -16,16 +16,6 @@ headersCSV = [
     "review_topics"
 ]
 
-# 간편조리식품
-category = 100002364
-catId = 50000026
-# # 밀키트
-# category = 100002371
-# catId = 50014240
-# # 과자/떡/베이커리
-# category = 100002372
-# catId = 50000149
-
 def productCrawler(category_id, catId, minReviewNum):
     url = 'https://search.shopping.naver.com/search/category/{}?catId={}&origQuery&pagingSize=80&productSet=total&query&sort=review&timestamp=&viewType=thumb'.format(
         category_id, catId
@@ -46,7 +36,7 @@ def productCrawler(category_id, catId, minReviewNum):
     }
     params = {
         'sort': 'review',
-        'pagingIndex': '3',
+        'pagingIndex': '1',
         'pagingSize': '80',
         'viewType': 'thumb',
         'productSet': 'model',
@@ -67,7 +57,7 @@ def productCrawler(category_id, catId, minReviewNum):
     )
     json_object = response.json()
     products = json_object['shoppingResult']['products']
-    totalPages = json_object['productSetFilter']['filterValues'][0]['productCount']//80
+    totalPages = json_object['productSetFilter']['filterValues'][1]['productCount']//80 # 가격비교 탭의 상품 수 / 80
 
     nowLoc = os.getcwd() # C:\Users\CJ\project\review_crawler
     f_object = open('{}/data/naverSmry/ids_{}.txt'.format(nowLoc,
@@ -79,8 +69,10 @@ def productCrawler(category_id, catId, minReviewNum):
         print(page)
         for product in products:
             if product['reviewCountSum'] > minReviewNum:
-                if product['mallProductUrl'][:18] == 'https://smartstore':
-                    f_object.write(product['mallProductUrl']+'\n')
+                if product['smryReview'] != '':
+                    f_object.write(product['productName']+'\001')
+                    f_object.write(product['smryReview']+'\001')
+                    f_object.write(product['crUrl']+'\n')
             else:
                 endSearch = True
                 break
@@ -91,7 +83,7 @@ def productCrawler(category_id, catId, minReviewNum):
             break
         response = requests.get('https://search.shopping.naver.com/api/search/category/{}'.format(
             category_id), params=params, headers=headers)
-        json_object = response.json()
+        json_object = response.json() # 307 에러발생
         products = json_object['shoppingResult']['products']
 
     f_object.close()
@@ -196,10 +188,18 @@ def reviewCrawler(target_url, category_id, sortTypeNum):
     f_object.close()
     print('The reviews of URL have been crawled.')
 
-
+# # 간편조리식품
+# category_id = 100002364
+# catId = 50000026
+# # 밀키트
+# category_id = 100002371
+# catId = 50014240
+# # 과자/떡/베이커리
+# category_id = 100002372
+# catId = 50000149
 
 if __name__ == '__main__':
     # target_url = 'https://smartstore.naver.com/main/products/574268591'
     # category_id = 100007947
     # reviewCrawler(target_url, category_id, 3)
-    print(os.getcwd())
+    productCrawler(100002364, 50000026, 45)
