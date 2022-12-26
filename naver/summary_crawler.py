@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import json
 from csv import DictWriter
 import os
+import time
 
 headersCSV = [
     "review_id",
@@ -64,10 +65,14 @@ def productCrawler(category_id, catId, minReviewNum):
                     category_id), 'w', encoding='utf-8-sig')
 
     endSearch = False
+    errorFlag = False
 
     for page in range(totalPages):
         print(page)
         for product in products:
+            if errorFlag:
+                errorFlag = False
+                break
             if product['reviewCountSum'] > minReviewNum:
                 if product['smryReview'] != '':
                     f_object.write(product['productName']+'\001')
@@ -83,11 +88,40 @@ def productCrawler(category_id, catId, minReviewNum):
             break
         response = requests.get('https://search.shopping.naver.com/api/search/category/{}'.format(
             category_id), params=params, headers=headers)
-        json_object = response.json() # 307 에러발생
+        time.sleep(0.5) # 429 에러 대응
+        if response.status_code == 307: # 307 에러 대응
+            print("307 에러 발생")
+            time.sleep(5)
+            response = requests.get('https://search.shopping.naver.com/api/search/category/{}'.format(
+                category_id), params=params, headers=headers)
+        try:
+            json_object = response.json()
+        except: # 주로 429 에러 발생함. Too many requests. 일정 시간 IP 차단함. 초당 10건 밑으로 요청해보자.
+            print("응답 코드:", response.status_code)
+            print("에러 발생.", page, "번째 페이지 건너뜀")
+            errorFlag = True
+            continue
         products = json_object['shoppingResult']['products']
 
     f_object.close()
     print('The URL of products have been crawled.')
+
+def reduceUrl(category_id):
+    nowLoc = os.getcwd()
+    f_object = open('{}/data/naverSmry/ids_{}.txt'.format(nowLoc, category_id), 'r', encoding='utf-8-sig')
+    lines = f_object.readlines()
+    result = []
+    mySet = set()
+    for x in lines:
+        y = x.split('\001')[0] + '\001' + x.split('\001')[1]
+        if y not in mySet:
+            mySet.add(y)
+            result.append(x)
+    f_object.close()
+    os.rename('{}/data/naverSmry/ids_{}.txt'.format(nowLoc, category_id), '{}/data/naverSmry/ids_{}_origin.txt'.format(nowLoc, category_id))
+    with open('{}/data/naverSmry/ids_{}.txt'.format(nowLoc, category_id), 'w', encoding='utf-8-sig') as file:
+        file.writelines(result)
+
 
 def get_review_topics(review_text, topics):
     text = ''
@@ -97,8 +131,12 @@ def get_review_topics(review_text, topics):
     return text
 
 
-def reviewCrawler(target_url, category_id, sortTypeNum):
+def reviewCrawler(target_url, category_id):
     response = requests.get(target_url)
+    refererUrl = response.url
+    topicList = ['taste', 'price', 'amount', 'capacity', 'packing', 'smell', 'food-texture', 'size', 'component']
+    # 용량, 양, 음식량 셋 다 amount
+    # 용량 capacity
     html = response.text
     soup = BeautifulSoup(html, 'html.parser')
     try:
@@ -117,12 +155,6 @@ def reviewCrawler(target_url, category_id, sortTypeNum):
     else: # 스마트 스토어
         merchant_num = json_object['smartStoreV2']['channel']['payReferenceKey']
     product_num = json_object['product']['A']['productNo']
-    sortType = [
-        'REVIEW_RANKING',           # 랭킹순
-        'REVIEW_CREATE_DATE_DESC',  # 최신순
-        'REVIEW_SCORE_DESC',        # 평점 높은순
-        'REVIEW_SCORE_ASC',         # 평점 낮은순
-    ]
 
     headers = {
         'authority': 'smartstore.naver.com',
@@ -145,7 +177,6 @@ def reviewCrawler(target_url, category_id, sortTypeNum):
         'pageSize': 20,
         'merchantNo': merchant_num,
         'originProductNo': product_num,
-        'sortType': sortType[sortTypeNum],
     }
 
     response = requests.post(
@@ -202,4 +233,4 @@ if __name__ == '__main__':
     # target_url = 'https://smartstore.naver.com/main/products/574268591'
     # category_id = 100007947
     # reviewCrawler(target_url, category_id, 3)
-    productCrawler(100002364, 50000026, 45)
+    productCrawler(100002364, 50000026, 0)
