@@ -6,15 +6,33 @@ import os
 import time
 
 headersCSV = [
-    "review_id",
-    "review_user_grade",
-    'review_user_name',
-    "review_time",
-    "review_help_cnt",
-    "review_text",
-    'product_name',
-    "product_id",
-    "review_topics"
+    'mallId',
+    'mallProductId',
+    'updateType',
+    'mallReviewId',
+    'mallSeq',
+    'nvMid',
+    'matchNvMid',
+    'userId',
+    'title',
+    'content',
+    'registerDate',
+    'modifyDate',
+    'createTime',
+    'qualityScore',
+    'starScore',
+    'imageYn',
+    'imageCount',
+    'videoYn',
+    'videoCount',
+    'topicYn',
+    'topicCount',
+    'topics',
+    'uniqueKey',
+    'mallName',
+    'mallLogo',
+    'cleanContent', # 리뷰 내용에서 태그 문자 제거 버전
+    'topicsSpan', # 인덱싱하여 뽑은 속성 문자열
 ]
 
 def productCrawler(category_id, catId, minReviewNum):
@@ -125,96 +143,87 @@ def reduceUrl(category_id):
 
 def get_review_topics(review_text, topics):
     text = ''
+    result = bytes(review_text, 'utf-8')
     for topic in topics:
-        text += '({}){}\n'.format(topic['topicCodeName'],
-                                  review_text[topic['startIdx']:topic['endIdx'] + 1])
+        text += '({}){}\n'.format(topic['topicName'],
+                                  result[topic['startPosition']:topic['endPosition'] + 1].decode('utf-8'))
     return text
 
 
-def reviewCrawler(target_url, category_id):
+def topicReviewCrawler(target_url, category_id):
     response = requests.get(target_url)
     refererUrl = response.url
+    tmp = refererUrl.split('?')[0]
+    productNum = tmp.split('/')[-1]
+
+    # 용량, 양, 음식량 = amount
+    # 용량 = capacity
     topicList = ['taste', 'price', 'amount', 'capacity', 'packing', 'smell', 'food-texture', 'size', 'component']
-    # 용량, 양, 음식량 셋 다 amount
-    # 용량 capacity
-    html = response.text
-    soup = BeautifulSoup(html, 'html.parser')
-    try:
-        dict = soup.select_one('body > script:nth-child(2)').get_text()
-    except: # 비동기식 스크립트 에러 발생. 나중에 고치기
-        return
-    dict = dict[27:]
-    if not dict.find('async') == -1: # 비동기식 스크립트 에러 발생. 나중에 고치기
-        return
-    try:
-        json_object = json.loads(dict)
-    except: # 비동기식 스크립트 에러 발생. 나중에 고치기
-        return
-    if response.url[:13] == 'https://brand': # 브랜드 스토어
-        merchant_num = json_object['channel']['A']['payReferenceKey']
-    else: # 스마트 스토어
-        merchant_num = json_object['smartStoreV2']['channel']['payReferenceKey']
-    product_num = json_object['product']['A']['productNo']
 
-    headers = {
-        'authority': 'smartstore.naver.com',
-        'accept': 'application/json, text/plain, */*',
-        'accept-language': 'ko',
-        'content-type': 'application/json;charset=UTF-8',
-        'origin': 'https://smartstore.naver.com',
-        'referer': target_url,
-        'sec-ch-ua': '"Microsoft Edge";v="105", " Not;A Brand";v="99", "Chromium";v="105"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-origin',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.42',
-    }
-
-    json_data = {
-        'page': 1,
-        'pageSize': 20,
-        'merchantNo': merchant_num,
-        'originProductNo': product_num,
-    }
-
-    response = requests.post(
-        'https://smartstore.naver.com/i/v1/reviews/paged-reviews', headers=headers, json=json_data)
-    data = response.json()
-    totalPages = data['totalPages']
-
-    # 크롤링할 마지막 페이지, 스마트스토어 리뷰는 천 페이지까지만 조회가능
-    lastPage = totalPages if totalPages < 1001 else 1000
-
-    f_object = open('data/naver/{}/{}.csv'.format(category_id, target_url[43:]), 'w',
+    f_object = open('data/naverSmry/{}/{}.csv'.format(category_id, productNum), 'w',
                     encoding='utf-8-sig', newline='')
     dictwriter_object = DictWriter(f_object, fieldnames=headersCSV)
     dictwriter_object.writeheader()
 
-    for page in range(lastPage):
-        if page % 100 == 0:
-            print("제품번호 {}, 페이지 {}번째 크롤링 중".format(target_url[43:], page))
-        for i in range(len(data['contents'])):
-            review = data['contents'][i]
-            dict = {
-                "review_id": review['id'],
-                "review_user_grade": review['reviewScore'],
-                'review_user_name': review['writerMemberId'],
-                "review_time": review['createDate'],
-                "review_help_cnt": review['helpCount'] if 'helpCount' in review.keys() else '0',
-                "review_text": review['reviewContent'],
-                'product_name': review['productName'],
-                "product_id": review['productNo'],
-                "review_topics": get_review_topics(review['reviewContent'], review['reviewTopics']) if 'reviewTopics' in review.keys() else '',
-            }
-            dictwriter_object.writerow(dict)
-        json_data['page'] += 1  # 다음 페이지 넘어가기
-        if json_data['page'] > lastPage:
-            break
-        response = requests.post(
-            'https://smartstore.naver.com/i/v1/reviews/paged-reviews', headers=headers, json=json_data)
-        data = response.json()
+    for topic in topicList:
+        headers = {
+            'authority': 'search.shopping.naver.com',
+            'accept': 'application/json, text/plain, */*',
+            'accept-language': 'ko',
+            'referer': '{}'.format(refererUrl),
+            'sec-ch-ua': '"Not?A_Brand";v="8", "Chromium";v="108", "Microsoft Edge";v="108"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 Edg/108.0.1462.54',
+        }
+        params = {
+            'nvMid': '{}'.format(category_id),
+            'topicCode': '{}'.format(topic),
+            'reviewType': 'ALL',
+            'sort': 'QUALITY',
+            'isNeedAggregation': 'Y',
+            'isApplyFilter': 'Y',
+            'page': '1',
+            'pageSize': '20',
+        }
+        while(True):
+            print('속성:', topic, '-', '페이지 {}번째 크롤링 중'.format(params['page']))
+            response = requests.get('https://search.shopping.naver.com/api/review', params=params, headers=headers)
+            # 속성 리뷰는 100 페이지까지만 조회가능
+            if response.status_code != 200:
+                print('응답 코드:', response.status_code)
+                break
+            data = response.json()
+            reviews = data['reviews']
+            if reviews == []:
+                break
+            for review in reviews:
+                # myDict = {
+                #     "review_id": review['id'],
+                #     "review_user_grade": review['reviewScore'],
+                #     'review_user_name': review['writerMemberId'],
+                #     "review_time": review['createDate'],
+                #     "review_help_cnt": review['helpCount'] if 'helpCount' in review.keys() else '0',
+                #     "review_text": review['reviewContent'],
+                #     'product_name': review['productName'],
+                #     "product_id": review['productNo'],
+                #     "review_topics": get_review_topics(review['reviewContent'], review['reviewTopics']) if 'reviewTopics' in review.keys() else '',
+                # }
+                myDict = review
+                content = review['content']
+                content = content.replace('<em>', '')
+                content = content.replace('</em>', '')
+                myDict['topicsSpan'] = get_review_topics(content, review['topics']) # 여기까지 완료했음
+                # content = content.replace('\r', '')
+                soup = BeautifulSoup(content, "html.parser")
+                myDict['cleanContent'] = soup.text
+                
+                dictwriter_object.writerow(myDict)
+                params['page'] += 1
+        print('The {} reviews have been crawled.'.format(topic))
 
     f_object.close()
     print('The reviews of URL have been crawled.')
@@ -229,8 +238,10 @@ def reviewCrawler(target_url, category_id):
 # category_id = 100002372
 # catId = 50000149
 
+
+
 if __name__ == '__main__':
-    # target_url = 'https://smartstore.naver.com/main/products/574268591'
-    # category_id = 100007947
-    # reviewCrawler(target_url, category_id, 3)
-    productCrawler(100002364, 50000026, 0)
+    target_url = 'https://cr.shopping.naver.com/adcr.nhn?x=8GiJOSTLnh39lObRmoUXO%2F%2F%2F%2Fw%3D%3Ds3UZ2T%2FH%2F6i2Wc71WcBbR4mss%2BDezz%2FPflB1qDLdWh5p5hkeImw66W5qs9aR1r7Z%2B%2FnRoq7YcJSxtMWn3v9ljcd9%2BKy%2Fm0d%2BgYWHtEf61Jo4hrX7i8ROREiNblWok2%2BM4oYeAqlreQxCn%2BOAbX6Xeh7Gg3nKmLbEMYSaftqeFnbrGpelaC3%2FK22mNkRoW9cmDnQubh9F08nN12zHsJEXRo4ZnlrSZr8PDPdBCvs8uWtdeJxHcKH4rYUhc5SxvGs%2FQIsksK7dd6ha3p3XZi36XM8ezX%2BiQ7LEkmIBpqnvCtIb84irqoupb5cHtoCFQH9lAJV03cukp%2F9sq6JmLvPVclAAQkM7F6TjwnGOyP%2BG99QPsoDTOjL%2FRwnN1Cm2LdaiIlmZqbWD5MrHBf672VYogS2HbbaXf3hnVKPBhSrO6MxDTnT7wrQ1XXGtOix8nYxu2UF4nJnyC41n0rMVn4Cj2YgRzTktOJsG39rC0oovAKqd6%2FPFyiqK0iBpqFnOtt1BIo64ifB9DVeZ8ffla9GlFdjFnjNpze14buYlWa7lHYeGukIuG8eXjARXROG%2Bb%2Brf%2Bi1X14H%2Bkq4Y3XEq%2BgyImSZeYgeOTEnI58BVLCkG%2FvJdjtEEnHZo%2B%2FVuCJHvsmHjrNWltBIaVSLNVGpbfcEUD4g%3D%3D&nvMid=10776362971&catId=50001876'
+    category_id = 100002364
+    topicReviewCrawler(target_url, category_id, 'taste')
+    # productCrawler(100002364, 50000026, 0)
