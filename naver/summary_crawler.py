@@ -171,6 +171,7 @@ def topicReviewCrawler(target_url, category_id, naverSmry):
     dictwriter_object = DictWriter(f_object, fieldnames=headersCSV)
     dictwriter_object.writeheader()
 
+    putNaverSmry = True
     for topic in topicList:
         headers = {
             'authority': 'search.shopping.naver.com',
@@ -195,11 +196,10 @@ def topicReviewCrawler(target_url, category_id, naverSmry):
             'page': '1',
             'pageSize': '20',
         }
-        putNaverSmry = True
         while(True):
             print('속성:', topic, '-', '페이지 {}번째 크롤링 중'.format(params['page']))
             response = requests.get('https://search.shopping.naver.com/api/review', params=params, headers=headers)
-            time.sleep(1.05) # 차단 방지 나중에 개선
+            time.sleep(0.5) # 차단 방지 나중에 개선
             # 속성 리뷰는 100 페이지까지만 조회가능
             if response.status_code != 200:
                 print('응답 코드:', response.status_code)
