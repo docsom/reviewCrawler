@@ -1,9 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
-import json
 from csv import DictWriter
-import os
+import glob, os
 import time
+import pandas as pd
 
 headersCSV = [
     'mallId',
@@ -230,6 +230,34 @@ def topicReviewCrawler(target_url, category_id, naverSmry):
     f_object.close()
     print('The reviews of URL have been crawled.')
 
+def putFoodName(category_id): # 상품 이름 넣는 함수
+    nowLoc = os.getcwd()
+    f_object = open('{}/data/naverSmry/ids_{}.txt'.format(nowLoc, category_id), 'r', encoding='utf-8-sig')
+    lines = f_object.readlines()
+    for line in lines:
+        foodName = line.split('\001')[0]
+        fileName = line.split('\001')[2]
+        fileName = fileName.split('&')[-2]
+        fileName = fileName.split('=')[1]
+        f = 'C:/Users/CJ/project/review_crawler/data/naverSmry/{}_reduced/{}.csv'.format(category_id, fileName)
+        if os.path.isfile(f):
+            df = pd.read_csv(f)
+            df['productName'] = foodName
+            df.to_csv(f, encoding='utf-8-sig', index = None)
+    f_object.close()
+
+def dropDuplicates(category_id): # 크롤링된 csv 파일에서 중복열 제거 후 랭킹순으로 리뷰 정렬 후 저장하는 함수
+    files = glob.glob('C:/Users/CJ/project/review_crawler/data/naverSmry/{}/*.csv'.format(category_id))
+    files.sort(key=os.path.getmtime) # 상품을 리뷰 많은 순으로 정렬
+    for f in files:
+        df = pd.read_csv(f)
+        if len(df['naverSmry']) == 0: # 빈 csv 파일 넘어가기
+            continue
+        df = df.drop_duplicates(['cleanContent']) # 중복 리뷰 제거
+        df = df.sort_values(by='qualityScore', axis=0, ignore_index=True, ascending=False) # 리뷰를 랭킹 점수 순으로 정렬
+        df.to_csv('C:/Users/CJ/project/review_crawler/data/naverSmry/{}_reduced/{}'.format(category_id, f.split('\\')[1]),encoding='utf-8-sig', index = None)
+
+
 # # 간편조리식품
 # category_id = 100002364
 # catId = 50000026
@@ -241,13 +269,14 @@ def topicReviewCrawler(target_url, category_id, naverSmry):
 # catId = 50000149
 
 if __name__ == '__main__':
-    category_id = 100002372
-    f_object = open('data/naverSmry/ids_{}.txt'.format(category_id), 'r', encoding='utf-8-sig')
-    lines = f_object.readlines()
-    for line in lines:
-        label = line.split('\001')[1]
-        target_url = line.split('\001')[2]
-        topicReviewCrawler(target_url, category_id, label)
-    f_object.close()
+    category_id = 100002364
+    # f_object = open('data/naverSmry/ids_{}.txt'.format(category_id), 'r', encoding='utf-8-sig')
+    # lines = f_object.readlines()
+    # for line in lines:
+    #     label = line.split('\001')[1]
+    #     target_url = line.split('\001')[2]
+    #     topicReviewCrawler(target_url, category_id, label)
+    # f_object.close()
+
     # target_url = 'https://cr.shopping.naver.com/adcr.nhn?x=8GiJOSTLnh39lObRmoUXO%2F%2F%2F%2Fw%3D%3Ds3UZ2T%2FH%2F6i2Wc71WcBbR4mss%2BDezz%2FPflB1qDLdWh5p5hkeImw66W5qs9aR1r7Z%2B%2FnRoq7YcJSxtMWn3v9ljcd9%2BKy%2Fm0d%2BgYWHtEf61Jo4hrX7i8ROREiNblWok2%2BM4oYeAqlreQxCn%2BOAbX6Xeh7Gg3nKmLbEMYSaftqeFnbrGpelaC3%2FK22mNkRoW9cmDnQubh9F08nN12zHsJEXRo4ZnlrSZr8PDPdBCvs8uWtdeJxHcKH4rYUhc5SxvGs%2FQIsksK7dd6ha3p3XZi36XM8ezX%2BiQ7LEkmIBpqnvCtIb84irqoupb5cHtoCFQH9lAJV03cukp%2F9sq6JmLvPVclAAQkM7F6TjwnGOyP%2BG99QPsoDTOjL%2FRwnN1Cm2LdaiIlmZqbWD5MrHBf672VYogS2HbbaXf3hnVKPBhSrO6MxDTnT7wrQ1XXGtOix8nYxu2UF4nJnyC41n0rMVn4Cj2YgRzTktOJsG39rC0oovAKqd6%2FPFyiqK0iBpqFnOtt1BIo64ifB9DVeZ8ffla9GlFdjFnjNpze14buYlWa7lHYeGukIuG8eXjARXROG%2Bb%2Brf%2Bi1X14H%2Bkq4Y3XEq%2BgyImSZeYgeOTEnI58BVLCkG%2FvJdjtEEnHZo%2B%2FVuCJHvsmHjrNWltBIaVSLNVGpbfcEUD4g%3D%3D&nvMid=10776362971&catId=50001876'
     # productCrawler(100002364, 50000026, 0)
