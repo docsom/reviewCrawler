@@ -102,7 +102,7 @@ def productCrawler(category_id, catId, minReviewNum):
             break
         response = requests.get('https://search.shopping.naver.com/api/search/category/{}'.format(
             category_id), params=params, headers=headers)
-        time.sleep(0.5) # 429 에러 대응
+        time.sleep(0.2) # 429 에러 대응
         if response.status_code == 307: # 307 에러 대응
             print("307 에러 발생")
             time.sleep(5)
@@ -163,7 +163,7 @@ def topicReviewCrawler(target_url, category_id, naverSmry):
 
     # 용량, 양, 음식량 = amount
     # 용량 = capacity
-    topicList = ['taste', 'price', 'amount', 'capacity', 'packing', 'smell', 'food-texture', 'size', 'component']
+    topicList = ['taste', 'price', 'amount', 'capacity', 'packing', 'smell', 'food-texture', 'size', 'component', 'design', 'color']
     keys = ['mallId', 'mallProductId', 'updateType', 'mallReviewId', 'mallSeq', 'nvMid', 'matchNvMid', 'userId', 'title', 'content', 'registerDate', 'modifyDate', 'createTime', 'qualityScore', 'starScore', 'topicYn', 'topicCount', 'topics', 'uniqueKey', 'mallName',]
 
     f_object = open('data/naverSmry/{}/{}.csv'.format(category_id, productNum), 'w',
@@ -199,7 +199,7 @@ def topicReviewCrawler(target_url, category_id, naverSmry):
         while(True):
             print('속성:', topic, '-', '페이지 {}번째 크롤링 중'.format(params['page']))
             response = requests.get('https://search.shopping.naver.com/api/review', params=params, headers=headers)
-            time.sleep(0.5) # 차단 방지 나중에 개선
+            time.sleep(0.8) # 차단 방지 나중에 개선, 0.5초도 차단당함
             # 속성 리뷰는 100 페이지까지만 조회가능
             if response.status_code != 200:
                 print('응답 코드:', response.status_code)
@@ -222,7 +222,10 @@ def topicReviewCrawler(target_url, category_id, naverSmry):
                 if putNaverSmry:
                     myDict['naverSmry'] = naverSmry
                     putNaverSmry = False
-                dictwriter_object.writerow(myDict)
+                try:
+                    dictwriter_object.writerow(myDict)
+                except:
+                    dictwriter_object.writerow({})
             params['page'] = str(int(params['page'])+1)
 
         print('The {} reviews have been crawled.'.format(topic))
@@ -267,9 +270,18 @@ def dropDuplicates(category_id): # 크롤링된 csv 파일에서 중복열 제�
 # # 과자/떡/베이커리
 # category_id = 100002372
 # catId = 50000149
+# # 장난감
+# category_id = 100003528
+# catId = 50000142
 
 if __name__ == '__main__':
-    category_id = 100002364
+    category_id = 100003528
+    catId = 50000142
+
+    # productCrawler(category_id, catId, 50)
+
+    # reduceUrl(category_id)
+
     # f_object = open('data/naverSmry/ids_{}.txt'.format(category_id), 'r', encoding='utf-8-sig')
     # lines = f_object.readlines()
     # for line in lines:
@@ -278,5 +290,6 @@ if __name__ == '__main__':
     #     topicReviewCrawler(target_url, category_id, label)
     # f_object.close()
 
-    # target_url = 'https://cr.shopping.naver.com/adcr.nhn?x=8GiJOSTLnh39lObRmoUXO%2F%2F%2F%2Fw%3D%3Ds3UZ2T%2FH%2F6i2Wc71WcBbR4mss%2BDezz%2FPflB1qDLdWh5p5hkeImw66W5qs9aR1r7Z%2B%2FnRoq7YcJSxtMWn3v9ljcd9%2BKy%2Fm0d%2BgYWHtEf61Jo4hrX7i8ROREiNblWok2%2BM4oYeAqlreQxCn%2BOAbX6Xeh7Gg3nKmLbEMYSaftqeFnbrGpelaC3%2FK22mNkRoW9cmDnQubh9F08nN12zHsJEXRo4ZnlrSZr8PDPdBCvs8uWtdeJxHcKH4rYUhc5SxvGs%2FQIsksK7dd6ha3p3XZi36XM8ezX%2BiQ7LEkmIBpqnvCtIb84irqoupb5cHtoCFQH9lAJV03cukp%2F9sq6JmLvPVclAAQkM7F6TjwnGOyP%2BG99QPsoDTOjL%2FRwnN1Cm2LdaiIlmZqbWD5MrHBf672VYogS2HbbaXf3hnVKPBhSrO6MxDTnT7wrQ1XXGtOix8nYxu2UF4nJnyC41n0rMVn4Cj2YgRzTktOJsG39rC0oovAKqd6%2FPFyiqK0iBpqFnOtt1BIo64ifB9DVeZ8ffla9GlFdjFnjNpze14buYlWa7lHYeGukIuG8eXjARXROG%2Bb%2Brf%2Bi1X14H%2Bkq4Y3XEq%2BgyImSZeYgeOTEnI58BVLCkG%2FvJdjtEEnHZo%2B%2FVuCJHvsmHjrNWltBIaVSLNVGpbfcEUD4g%3D%3D&nvMid=10776362971&catId=50001876'
-    # productCrawler(100002364, 50000026, 0)
+    # dropDuplicates(category_id)
+
+    # putFoodName(category_id)
